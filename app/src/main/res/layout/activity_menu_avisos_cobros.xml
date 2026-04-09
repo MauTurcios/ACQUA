@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:background="@color/gris"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MenuAvisosCobros">
+
+    <LinearLayout
+        android:id="@+id/lyEncabezado"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/alturaEncabezados"
+        android:background="@color/md_theme_light_primary"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/btnAtras"
+            android:layout_width="@dimen/estandar_55dp"
+            android:layout_height="@dimen/estandar_55dp"
+            android:layout_margin="@dimen/margin4dp"
+            android:backgroundTint="@color/md_theme_light_primary"
+            android:contentDescription="btnRegresar"
+            app:srcCompat="@drawable/outline_arrow_back_24" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin4dp"
+            android:layout_marginStart="@dimen/margin4dp"
+            android:text="AVISOS DE COBRO"
+            android:textSize="@dimen/FuenteEncabezado"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/listadoClientes"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/spinner_bg"
+        android:layout_marginTop="@dimen/margin8dp"
+        android:layout_marginBottom="@dimen/margin8dp"
+        android:layout_marginStart="@dimen/margin8dp"
+        android:layout_marginEnd="@dimen/margin8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lyEncabezado"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnNuevoAviso"
+        android:layout_width="@dimen/estandar_55dp"
+        android:layout_height="@dimen/estandar_55dp"
+        android:backgroundTint="@color/btnAddColor"
+        android:layout_margin="@dimen/marginDefault"
+        android:contentDescription="nuevaAviso"
+        android:src="@drawable/ic_baseline_add_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

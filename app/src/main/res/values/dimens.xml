@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="CornerRadiusDefault">10dp</dimen>
+    <dimen name="marginDefault">16dp</dimen>
+    <dimen name="marginDouble">32dp</dimen>
+    <dimen name="margin4dp">4dp</dimen>
+    <dimen name="margin8dp">8dp</dimen>
+
+    <!-- BORDE LOGO -->
+    <dimen name="margin_logo">50dp</dimen>
+
+    <!-- TAMAÑO DE LAS FUENTES -->
+    <dimen name="Titulo">18sp</dimen>
+    <dimen name="FuenteEncabezado">18sp</dimen>
+
+    <!-- TAMAÑO DE LOS BOTONES -->
+    <dimen name="estandar_55dp">55dp</dimen>
+
+    <!-- ALTURA DE LOS ENCABEZADOS -->
+    <dimen name="alturaEncabezados">60dp</dimen>
+</resources>

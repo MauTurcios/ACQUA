@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nuevoAviso"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MenuAvisosCobros"
+    android:background="@color/white">
+
+
+    <LinearLayout
+        android:id="@+id/encNuevoAviso"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/alturaEncabezados"
+        android:background="@color/md_theme_light_primary"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/btnAtras"
+            android:layout_width="@dimen/estandar_55dp"
+            android:layout_height="@dimen/estandar_55dp"
+            android:layout_margin="@dimen/margin4dp"
+            android:backgroundTint="@color/md_theme_light_primary"
+            android:contentDescription="btnRegresar"
+            app:srcCompat="@drawable/outline_arrow_back_24" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin4dp"
+            android:layout_marginStart="@dimen/margin4dp"
+            android:text="NUEVO AVISO DE COBRO"
+            android:textSize="@dimen/FuenteEncabezado"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/datos"
+        android:layout_width="413dp"
+        android:layout_height="99dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/encNuevoAviso"
+        app:layout_constraintVertical_bias="0.035"
+        tools:ignore="MissingConstraints">
+
+        <TextView
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:id="@+id/codigoCliente"
+            android:layout_width="match_parent"
+            android:layout_height="29dp"
+            android:textAlignment="center"
+            android:text="Codigo" />
+
+        <TextView
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:id="@+id/casa"
+            android:layout_width="match_parent"
+            android:layout_height="29dp"
+            android:textAlignment="center"
+            android:text="Casa" />
+
+        <TextView
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:id="@+id/nombreCliente"
+            android:layout_width="match_parent"
+            android:layout_height="29dp"
+            android:textAlignment="center"
+            android:text="Nombre" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/aviso"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/datos"
+        app:layout_constraintVertical_bias="0.0"
+        tools:ignore="MissingConstraints">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/avisoLectura"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/marginDefault"
+            android:layout_marginTop="@dimen/marginDefault"
+            android:layout_marginEnd="@dimen/marginDefault"
+            android:layout_marginBottom="@dimen/margin4dp"
+            android:background="@color/white"
+            android:hint="LECTURA"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lyTituloFormularioConexion">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/txtLectura"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="text"
+                android:textAllCaps="true"
+                android:textColor="@color/black"
+                android:textSize="18sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/lyBtnIngresar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtLectura">
+
+            <Button
+                android:id="@+id/btnEnviar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin8dp"
+                android:layout_marginBottom="@dimen/margin8dp"
+                android:text="ENVIAR LECTURA"
+                android:textAlignment="center"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.7" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,32 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Acqua" parent="Theme.Material3.Light.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- Colores principales -->
+        <item name="colorPrimary">@color/md_theme_light_primary</item>
+        <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
+
+        <item name="colorSecondary">@color/md_theme_light_secondary</item>
+        <item name="colorOnSecondary">@color/md_theme_light_onSecondary</item>
+
+        <item name="backgroundColor">@color/md_theme_light_background</item>
+        <item name="colorOnBackground">@color/md_theme_light_onBackground</item>
+
+        <item name="colorSurface">@color/md_theme_light_surface</item>
+        <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
+
+        <item name="colorError">@color/md_theme_light_error</item>
+        <item name="colorOnError">@color/md_theme_light_onError</item>
+
+        <!-- Tipografía-->
+        <item name="android:fontFamily">@font/roboto_regular</item>
+
+        <!-- Elevación / shapes -->
+        <item name="shapeCornerFamily">rounded</item>
+        <item name="shapeCornerSizeSmall">4dp</item>
+        <item name="shapeCornerSizeMedium">8dp</item>
+        <item name="shapeCornerSizeLarge">12dp</item>
+    </style>
+
+    <style name="Theme.Acqua" parent="Base.Theme.Acqua" />
+</resources>
