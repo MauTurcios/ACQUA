@@ -16,17 +16,27 @@ import com.sismantec.acqua.entities.ClientesEntity
 import com.sismantec.acqua.models.Cliente
 
 
-class ClienteAdapter() : RecyclerView.Adapter<ClienteAdapter.ViewHolder>(){
+class ClienteAdapter(
+    private val itemClick: (ClientesEntity) -> Unit
+) : RecyclerView.Adapter<ClienteAdapter.ViewHolder>(){
 
     //var funciones :Funciones? = null
     private var lista: List<ClientesEntity> = emptyList()
     private var listaBusqueda : List<ClientesEntity> = emptyList()
-    private val rutaSeleccionada: Int? = null
+    //private val rutaSeleccionada: Int? = null
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
         val codigo : TextView = itemView.findViewById<TextView>(R.id.Codigo)
         val cliente : TextView = itemView.findViewById<TextView>(R.id.Cliente)
         val casa : TextView = itemView.findViewById<TextView>(R.id.Direccion)
-        val tarjetaCliente: CardView = itemView.findViewById(R.id.clienteTarjeta)
+        fun bind(item: ClientesEntity){
+            codigo.text = item.Codigo
+            cliente.text = item.Cliente
+            casa.text = item.Casa
+
+            itemView.setOnClickListener {
+                itemClick(item)
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -36,10 +46,12 @@ class ClienteAdapter() : RecyclerView.Adapter<ClienteAdapter.ViewHolder>(){
     }
 
     override fun onBindViewHolder(holder: ViewHolder, conta: Int) {
-        holder.codigo.text = lista[conta].Codigo
-        holder.cliente.text = lista[conta].Cliente
-        holder.casa.text = lista[conta].Casa
-
+        holder.bind(lista[conta])
+        //holder.codigo.text = lista[conta].Codigo
+        //holder.cliente.text = lista[conta].Cliente
+        //holder.casa.text = lista[conta].Casa
+        /*
+        //MOVER FUNCIONALIDAD A LA ACTIVITY
         val item = lista[conta]
         holder.itemView.setOnClickListener {
             Log.d("CLIENTE_CLICK", "ID: ${item.Id}")
@@ -47,7 +59,7 @@ class ClienteAdapter() : RecyclerView.Adapter<ClienteAdapter.ViewHolder>(){
             val intent = Intent(context, DatosCliente::class.java)
             intent.putExtra("Id_cliente", item.Id)
             context.startActivity(intent)
-        }
+        }*/
     }
 
     override fun getItemCount()= lista.size
@@ -63,8 +75,8 @@ class ClienteAdapter() : RecyclerView.Adapter<ClienteAdapter.ViewHolder>(){
         lista = listaBusqueda.filter { cliente ->
             val coincideTexto =
                 texto.isEmpty() ||
-                        cliente.Cliente.trim().contains(textoLimpio) ||
-                        cliente.Codigo.trim().contains(textoLimpio)
+                        cliente.Cliente.trim().contains(textoLimpio,true) ||
+                        cliente.Codigo.trim().contains(textoLimpio,true)
 
             val coincideRuta =
                 rutaId == null || cliente.Id_ruta == rutaId

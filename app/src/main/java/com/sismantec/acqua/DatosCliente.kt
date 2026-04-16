@@ -25,7 +25,6 @@ class DatosCliente: AppCompatActivity() {
     private lateinit var txtCasa: TextView
     private var idCliente : Int = 0
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         biding = ActivityDatosClienteBinding.inflate(layoutInflater)
@@ -37,7 +36,7 @@ class DatosCliente: AppCompatActivity() {
         txtCasa = findViewById(R.id.txtCasa)
 
         viewModel = ViewModelProvider(this)[clienteViewModel::class.java]
-        idCliente = intent.getIntExtra("Id_cliente", 0)
+        idCliente = intent.getIntExtra("idCliente", 0)
         Log.d("DATOS", "ID recibido: $idCliente")
         cargarCliente()
         onBackPressedDispatcher.addCallback(this){}

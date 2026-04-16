@@ -13,6 +13,8 @@ class rutaViewModel (application: Application): AndroidViewModel(application){
     private val rutasDAO = db.RutasDAO()
     val rutas = rutasDAO.obtenerRutas().asLiveData()
 
+    //var rutaSeleccionada: Int? = null
+
     //insertando rutas
     fun insertarRutas (list: List<RutasEntity>){
         viewModelScope.launch {

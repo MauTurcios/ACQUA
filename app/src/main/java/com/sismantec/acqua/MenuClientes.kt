@@ -67,28 +67,92 @@ class MenuClientes : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMenuClientesBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        preferences = getSharedPreferences(instancia, Context.MODE_PRIVATE)
+        iniVar()
+        //cargarDatos()
+        mostrarClientes()
+        observersVM()
+        onBackPressedDispatcher.addCallback(this) {}
+    }
+
+
+    override fun onStart() {
+        super.onStart()
+        busqueda()
+        filtroRuta()
+        binding.btnAtras.setOnClickListener {
+            if(proviene.contains("nuevoAviso")){
+                menuAvisoCobro()
+            }else{
+                menuInicio()
+            }
+        }
+        binding.mainCliente
+
+        actualizarTitulo()
+    }
+    /*
+    private fun cargarDatos(){
+        lifecycleScope.launch {
+            clienteController.obtenerClientes(this@MenuClientes,viewModel)
+        }
+    }
+     */
+
+
+    //FUNCION PARA INICIALIZAR VARIABLES
+    private fun iniVar(){
+        preferences = getSharedPreferences(instancia, MODE_PRIVATE)
         cargarClientes = preferences!!.getString("CargarClientes", "").toString()
         proviene = intent.getStringExtra("proviene").toString()
+
         mainCliente = findViewById(R.id.mainCliente)
         recicle = binding.listadoClientes
-        clienteAdapter = ClienteAdapter()
+
         viewModel = ViewModelProvider(this)[clienteViewModel::class.java]
         rutasViewModel = ViewModelProvider(this)[rutaViewModel::class.java]
-        val imgRutaFiltro = findViewById<ImageView>(R.id.btnFiltro)
+    }
+
+
+    //FUNCIÓN PARA CONFIGURAR RECYCLERVIEW Y CLIENTE ADAPTER
+    private fun mostrarClientes(){
+        clienteAdapter = ClienteAdapter {
+                cliente ->
+            if(proviene.contains("nuevoAviso")){
+                val intent = Intent(this, AvisoCobro::class.java)
+                intent.putExtra("idCliente",cliente.Id)
+                startActivity(intent)
+                finish()
+            }else{
+                val intent = Intent(this, DatosCliente::class.java)
+                intent.putExtra("idCliente",cliente.Id)
+                startActivity(intent)
+                finish()
+            }
+        }
         recicle?.adapter = clienteAdapter
         recicle?.layoutManager = LinearLayoutManager(this)
+    }
 
+    //OBSERVERS DE RUTAS Y CLIENTES
+    private fun observersVM(){
         rutasViewModel.rutas.observe(this){ rutas ->
             listaRutas = rutas
+            actualizarTitulo()
         }
-
         viewModel.clientes.observe(this){
-            lista ->
-            //Log.d("CLIENTES", "Lista size: ${lista.size}")
+                lista ->
             clienteAdapter.actualizarLista(lista)
-        }
+            val txtBusqueda = findViewById<TextInputEditText>(R.id.txtBusquedaCliente)
 
+            clienteAdapter.busquedaFiltro(
+                txtBusqueda.text.toString(),
+                rutaSeleccionada
+            )
+        }
+    }
+
+    //BUSQUEDA DE CLIENTES
+    private fun busqueda(){
         val txtBusqueda = findViewById<TextInputEditText>(R.id.txtBusquedaCliente)
         txtBusqueda.addTextChangedListener(object : TextWatcher{
             override fun afterTextChanged(s: Editable?) {
@@ -97,11 +161,11 @@ class MenuClientes : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
+    }
 
-        lifecycleScope.launch {
-            clienteController.obtenerClientes(this@MenuClientes,viewModel)
-        }
-
+    //FILTRO DE RUTAS
+    private fun filtroRuta(){
+        val imgRutaFiltro = findViewById<ImageView>(R.id.btnFiltro)
         imgRutaFiltro.setOnClickListener {
             if (listaRutas.isEmpty()) {
                 Toast.makeText(this, "NO HAY RUTAS GUARDADAS", Toast.LENGTH_SHORT).show()
@@ -120,6 +184,11 @@ class MenuClientes : AppCompatActivity() {
                 }else {
                     listaRutas[item.itemId].Id
                 }
+                //GUARDO LA RUTA SELECCIONADA
+                rutaSeleccionada = rutaSeleccion
+                actualizarTitulo()
+
+                val txtBusqueda = findViewById<TextInputEditText>(R.id.txtBusquedaCliente)
                 clienteAdapter.busquedaFiltro(
                     txtBusqueda.text.toString(),
                     rutaSeleccion
@@ -127,47 +196,40 @@ class MenuClientes : AppCompatActivity() {
                 true
             }
             selectRuta.show()
-
         }
-
-        onBackPressedDispatcher.addCallback(this) {}
     }
 
-    override fun onStart() {
-        super.onStart()
-
-        binding.btnAtras.setOnClickListener {
-            if(proviene.contains("nuevoAviso")){
-                menuAvisoCobro()
-            }else{
-                menuInicio()
-            }
-        }
-        binding.mainCliente
-
-        binding.lblTituloMenuCliente.text = if(proviene.contains("nuevoAviso")) {
+    private fun actualizarTitulo(){
+        val titulo = if(proviene.contains("nuevoAviso")) {
             "CLIENTE (NUEVO AVISO)"
         }else{
             "LISTADO CLIENTES"
         }
+        val nombreRuta = rutaSeleccionada?.let { id ->
+            listaRutas.find { it.Id==id }?.Ruta
+        }
+        binding.lblTituloMenuCliente.text =
+            if (nombreRuta != null){
+                "$titulo - $nombreRuta"
+            }else{
+                titulo
+            }
     }
+
+    companion object {
+        var rutaSeleccionada : Int? = null
+    }
+
     private fun menuAvisoCobro(){
-        val intent = Intent(this@MenuClientes, Menu AvisosCobros::class.java)
+        val intent = Intent(this@MenuClientes, MenuAvisosCobros::class.java)
         startActivity(intent)
         finish()
     }
+
 
     private fun menuInicio(){
         val intent = Intent(this@MenuClientes, Inicio::class.java)
         startActivity(intent)
         finish()
     }
-
-    //PARA VER DATOS GENERALES DEL CLIENTE
-    private fun datosCliente(){
-
-    }
-
-
 }
-
