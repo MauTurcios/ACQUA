@@ -28,4 +28,60 @@
 
     <!-- ROJO -->
     <color name="rojo">#C90000</color>
+
+
+    <!-- COLORES INSPIRADOS EN LA APP DE VENTAS -->
+    <color name="colorPrimaryDark">#061743</color>
+    <color name="colorAccent">#FFFFFF</color>
+    <color name="colordark">#2A3132</color>
+    <color name="moderado">#762626</color>
+
+    <color name="colorPrimary_bk">#064870</color>
+    <color name="colorPrimaryDark_bk">#064870</color>
+
+    <color name="cart">#0C5891</color>
+    <color name="cartold">#0C5891</color>
+    <color name="inicio_cart">#e3f2fd</color>
+    <color name="border">#e0e0e0</color>
+    <color name="icons">#9e9e9e</color>
+    <color name="recicler">#EFEFEF</color>
+    <color name="detallePedido">#F1F1F1</color>
+    <color name="colorHint">#2B2B2B</color>
+
+    <color name="colorPrimaryOld">#195176</color>
+    <color name="colorPrimaryDarkOld">#195176</color>
+    <color name="SEGUNDOCOLORLOGO">#69A0B9</color>
+    <color name="PRIMERCOLORLOGO">#064870</color>
+
+
+
+
+    <!-- COLORES PARA BOTONES -->
+    <!-- AZUL -->
+    <color name="btnAzul">#061743</color>
+    <color name="btnAzulActivo">#173E78</color>
+
+    <color name="btnAzul_bk">#061743</color>
+    <color name="btnAzulActivo_bk">#173E78</color>
+
+
+    <!-- VERDE -->
+    <color name="btnVerde">#308C34</color>
+    <color name="btnVerdeActivo">#34AC39</color>
+
+    <!-- ROJO -->
+    <color name="btnRojo">#BF2727</color>
+    <color name="btnRojoActivo">@android:color/holo_red_light</color>
+
+    <!-- TOAST -->
+    <color name="colorRojo">#A80707</color>
+    <color name="colorError">#FFCACA</color>
+    <color name="colorVerde">#1F9A24</color>
+    <color name="toastAccept">#C0EEC2</color>
+
+    <!-- COLOR NUEVO MENU -->
+    <color name="colorPrincipalOscuro">#061743</color>
+    <color name="colorSecundarioClaro">#173E78</color>
+    <color name="gris_cart">#4D4F53</color>
+    <color name="blanco_suave">#F7F6F3</color>
 </resources>
