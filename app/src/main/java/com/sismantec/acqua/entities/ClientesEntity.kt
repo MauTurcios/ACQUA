@@ -11,5 +11,6 @@ data class ClientesEntity(
     val Casa: String?,
     val Poligono: String?,
     val Id_ruta: Int,
-    val Codigo_casa: String?
+    val Codigo_casa: String?,
+    val Direccion: String?
 )

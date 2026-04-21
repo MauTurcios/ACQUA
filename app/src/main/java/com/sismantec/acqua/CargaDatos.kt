@@ -60,7 +60,7 @@ class CargaDatos : AppCompatActivity() {
         db = AppDataBase.obtenerInstancia(this@CargaDatos)
         preferences = this@CargaDatos.getSharedPreferences(instancia, Context.MODE_PRIVATE)
         alert = AlertDialogo(this@CargaDatos, this)
-        //url = funciones.obtenerServidor(context = this@CargaDatos)
+        url = funciones.obtenerServidor(context = this@CargaDatos)
         onBackPressedDispatcher.addCallback(this) {}
 
     }

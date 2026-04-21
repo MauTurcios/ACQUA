@@ -56,7 +56,8 @@ class ClientesController {
                         Casa = it.Casa,
                         Poligono = it.Poligono,
                         Id_ruta = it.Id_ruta,
-                        Codigo_casa = it.Codigo_casa
+                        Codigo_casa = it.Codigo_casa,
+                        Direccion = it.Direccion
                     )
                 }
                 viewModel.insertarClientes(cliente)

@@ -348,6 +348,7 @@
                                     android:textColor="@color/white"
                                     android:textSize="15sp"
                                     android:textStyle="bold"
+                                    android:backgroundTint="@color/btnAzul_bk"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toBottomOf="@+id/cardVersiones" />
@@ -401,6 +402,7 @@
                             android:textColor="@color/white"
                             android:textSize="15sp"
                             android:textStyle="bold"
+                            android:backgroundTint="@color/btnAzul_bk"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@id/txtUpdate" />

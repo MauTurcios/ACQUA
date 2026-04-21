@@ -111,7 +111,7 @@ class Funciones {
     //FUNCION PARA OBTENER LA FECHA Y HORA FORMATEADA
     //--------------------
     fun obtenerFechaHoraFormateada() : String{
-        val fechaFormato = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        val fechaFormato = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
         val fecha = fechaFormato.format(Date())
 
         return fecha

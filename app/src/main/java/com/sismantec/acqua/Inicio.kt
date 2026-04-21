@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import com.sismantec.acqua.Util.SessionManager
 import com.sismantec.acqua.controller.LoginController
 import com.sismantec.acqua.databinding.ActivityInicioBinding
 import kotlinx.coroutines.Dispatchers
@@ -23,8 +24,8 @@ class Inicio : AppCompatActivity() {
     private lateinit var binding: ActivityInicioBinding
     private val instancia = "CONFIG_SERVIDOR"
     private lateinit var preferencias: SharedPreferences
-    private var vendedor: String = ""
-    private var idVendedor: Int = 0
+    private var vendedor : String = ""
+    private var idVendedor : Int = 0
     private var logincontroller = LoginController()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,7 +59,7 @@ class Inicio : AppCompatActivity() {
             mensajeConfirmacion()
         }
 
-        binding.lblEmpleado.text = vendedor.toString()
+        binding.lblEmpleado.text = vendedor
 
         binding.imgConfigMovil.setOnClickListener {
             menuConfiguracion()

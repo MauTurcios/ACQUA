@@ -21,8 +21,10 @@ import com.dantsu.escposprinter.connection.usb.UsbConnection
 import com.dantsu.escposprinter.textparser.PrinterTextParserImg
 import com.sismantec.acqua.R
 import com.sismantec.acqua.funciones.Operativo
+import com.sismantec.acqua.models.DatosAvisoCobro
 import com.sismantec.acqua.database.AppDataBase
 import com.sismantec.acqua.entities.ConfigEntity
+import com.sismantec.acqua.funciones.Funciones
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -35,11 +37,13 @@ class ImpresionController(private val context: Context) {
 
     private lateinit var preferencias: SharedPreferences
     private var instancia = "CONFIG_SERVIDOR"
+    private var fhformato = Funciones().obtenerFechaHoraFormateada()
     val config = Operativo(context)
+
+
     //FUNCION PARA DETERMINAR LA CONEXION DE LA IMPRESORA
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
-    fun imprimirRecibo(context: Context) {
-        preferencias = context.getSharedPreferences(instancia, Context.MODE_PRIVATE)
+    fun imprimirRecibo(context: Context, datos: DatosAvisoCobro) {
         try {
             val tipoImpresora = preferencias.getString("tipoImpresora", "")
             when(tipoImpresora){
@@ -54,7 +58,7 @@ class ImpresionController(private val context: Context) {
                             if (config == null) {
                                 config.cargarConfig()
                             }
-                            imprimirTicket(btConnection, context, config)
+                            imprimirTicket(btConnection, context, config, datos)
                         }
                     } else {
                         Toast.makeText(context, "No se encontró impresora USB ni Bluetooth", Toast.LENGTH_SHORT).show()
@@ -74,7 +78,9 @@ class ImpresionController(private val context: Context) {
     }
 
     //FUNCION DEL FORMATO DEL TICKET
-    private suspend fun imprimirTicket(connection: Any, context: Context, config: Operativo) {
+    private suspend fun imprimirTicket(connection: Any, context: Context, config: Operativo, datos: DatosAvisoCobro) {
+        preferencias = context.getSharedPreferences(instancia, Context.MODE_PRIVATE)
+        var vendedor : String = preferencias.getString("nombreEmpleado", "").toString()
         val textoPie = "ESTE DOCUMENTO NO TIENE VALIDEZ FISCAL"
         val usbManager = context.getSystemService(Context.USB_SERVICE) as UsbManager
 
@@ -91,8 +97,6 @@ class ImpresionController(private val context: Context) {
         val nrc = dividirEnLineas(config.nrc(),32)
         val nit = dividirEnLineas(config.nit(), 32)
         val giroCliente = dividirEnLineas("", 32)
-        val direccionCliente = dividirEnLineas("COLONIA LA PRADERA, POLIGONO D-05 CASA 26, SAN MIGUEL,SAN MIGUEL",32)
-
         // ===============================
         // Preparar logo y texto
         // ===============================
@@ -157,12 +161,12 @@ class ImpresionController(private val context: Context) {
             .append("[L]--------------------------------\n")
             .append("[C]DATOS DEL CLIENTE\n")
             .append("[L]--------------------------------\n")
-            .append("[L]NUM DE CUENTA: <u><font size='big'>EE1286</font></u>\n")
+            .append("[L]NUM DE CUENTA: <u><font size='big'>${datos.cliente.Codigo}</font></u>\n")
             .append("[L]NOMBRE:\n")
-            .append("[C]SALVADOR GARCIA FUENTES\n")
+            .append("[C]${datos.cliente.Cliente}\n")
             .append("[L]DOCUMENTO: 123456789 \n")
             .append("[L]DIRECCION: \n")
-            .append("[L]$direccionCliente\n")
+            .append("[L]${datos.cliente.Direccion}\n")
             .append("[L]--------------------------------\n")
             .append("[C]DETALLE DEL DOCUMENTO\n")
             .append("[L]--------------------------------\n")
@@ -181,8 +185,8 @@ class ImpresionController(private val context: Context) {
             .append("[L]--------------------------------\n")
             .append(filaTablaTotales("TOTAL", "", "", "$ ${String.format("%.2f", 10.93)}"))
             .append("[L]--------------------------------\n\n")
-            .append("[L]ENTREGADO POR: ANTONIO HERNANDEZ\n")
-            .append("[C]FECHA: 02-01-2026 \n")
+            .append("[L]ENTREGADO POR: ${vendedor}\n")
+            .append("[C]FECHA: ${fhformato} \n")
             .append("[C]<b>$textoPieFormateado</b>\n")
             .append(" \n")
 
@@ -201,6 +205,8 @@ class ImpresionController(private val context: Context) {
     //FUNCION PARA IMPRIMIR EL RECIBO INTREGRADO
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     private fun imprimirReciboIntegrado(context: Context, config: Operativo){
+        preferencias = context.getSharedPreferences(instancia, Context.MODE_PRIVATE)
+        var vendedor : String = preferencias.getString("nombreEmpleado", "").toString()
         val textoPie = "ESTE DOCUMENTO NO TIENE VALIDEZ FISCAL"
 
         val printManager = context.getSystemService(Context.PRINT_SERVICE) as PrintManager
@@ -316,7 +322,7 @@ class ImpresionController(private val context: Context) {
                 .append("[L]--------------------------------\n")
                 .append(filaTablaTotales("TOTAL", "", "", "$ ${String.format("%.2f", 10.93)}"))
                 .append("[L]--------------------------------\n\n")
-                .append("[L]ENTREGADO POR: ANTONIO HERNANDEZ\n")
+                .append("[L]ENTREGADO POR: ${vendedor}\n")
                 .append("[C]FECHA: 02-01-2026 \n")
                 .append("[C]<b>$textoPieFormateado</b>\n")
                 .append(" \n")

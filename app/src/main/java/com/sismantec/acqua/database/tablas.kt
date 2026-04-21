@@ -9,12 +9,13 @@ class Tablas {
                 "Casa Varchar(50)  NULL,"+
                 "Poligono Varchar(50)  NULL,"+
                 "Id_ruta"+
-                "Codigo_casa Varchar(100)  NULL"
+                "Codigo_casa Varchar(100)  NULL,"+
+                "Direccion Varchar(200) NULL);"
     }
     fun tbRutas(): String{
         return "CREATE TABLE Rutas("+
                 "Id INTEGER PRIMARY KEY NOT NULL," +
-                "Ruta VARCHAR(50) NOT NULL"
+                "Ruta VARCHAR(50) NOT NULL);"
     }
     fun tbConfig(): String{
         return "CREATE TABLE Config("+
@@ -30,6 +31,17 @@ class Tablas {
                 "dteNombreComercial Varchar(150)  NULL,"+
                 "dteDireccion Varchar(200)  NULL,"+
                 "dteTelefono Varchar(30)  NULL,"+
-                "dteCorreo Varchar(100)  NULL"
+                "dteCorreo Varchar(100)  NULL);"
     }
+    fun tbVersionApp(): String{
+        return "CREATE TABLE VersionApp("+
+                "Id INTEGER PRIMARY KEY NOT NULL," +
+                "VersionApp VARCHAR(25) NULL);"
+    }
+    fun empleados(): String {
+        return "CREATE TABLE empleado(" +
+                "id_empleado INTEGER NOT NULL," +
+                "nombre_empleado VARCHAR(50) NOT NULL);"
+    }
+
 }

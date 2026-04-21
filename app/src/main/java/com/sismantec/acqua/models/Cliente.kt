@@ -8,5 +8,6 @@ data class Cliente (
     @SerializedName("casa") val Casa: String? ="0",
     @SerializedName("poligono") val Poligono: String?="0",
     @SerializedName("id_ruta") val Id_ruta: Int,
-    @SerializedName("codigo_casa") val Codigo_casa: String?="0"
+    @SerializedName("codigo_casa") val Codigo_casa: String?="0",
+    @SerializedName("direccion") val Direccion: String? = ""
     )

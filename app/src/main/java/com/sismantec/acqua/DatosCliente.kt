@@ -23,6 +23,7 @@ class DatosCliente: AppCompatActivity() {
     private lateinit var txtCodigo: TextView
     private lateinit var txtCliente: TextView
     private lateinit var txtCasa: TextView
+    private lateinit var txtDireccion: TextView
     private var idCliente : Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,7 +35,7 @@ class DatosCliente: AppCompatActivity() {
         txtCodigo = findViewById(R.id.txtCodigo)
         txtCliente = findViewById(R.id.txtCliente)
         txtCasa = findViewById(R.id.txtCasa)
-
+        txtDireccion = findViewById(R.id.txtDireccion)
         viewModel = ViewModelProvider(this)[clienteViewModel::class.java]
         idCliente = intent.getIntExtra("idCliente", 0)
         Log.d("DATOS", "ID recibido: $idCliente")
@@ -64,6 +65,8 @@ class DatosCliente: AppCompatActivity() {
                 txtCodigo.text = cliente.Codigo
                 txtCliente.text = cliente.Cliente
                 txtCasa.text = cliente.Casa
+                txtDireccion.text = cliente.Direccion
+
             }
         }
     }

@@ -83,6 +83,15 @@
                     android:layout_height="wrap_content"
                     android:textAlignment="center"
                     android:text="Nombre" />
+
+            <TextView
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:id="@+id/direccion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:text="Direccion" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
@@ -103,12 +112,12 @@
             android:id="@+id/avisoLectura"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
+            android:background="@color/white"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/marginDefault"
             android:layout_marginTop="@dimen/marginDefault"
             android:layout_marginEnd="@dimen/marginDefault"
             android:layout_marginBottom="@dimen/margin4dp"
-            android:background="@color/white"
             android:hint="LECTURA"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

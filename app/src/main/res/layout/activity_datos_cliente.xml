@@ -43,7 +43,7 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/lyDatosCliente"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin8dp"
         android:layout_marginEnd="@dimen/margin8dp"
         android:layout_marginTop="8dp"
@@ -61,17 +61,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/txtCliente"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
-            android:layout_marginStart="100dp"
-            android:text="Cliente"
-            tools:ignore="MissingConstraints"
-            tools:layout_editor_absoluteX="56dp"
-            tools:layout_editor_absoluteY="160dp" />
 
         <TextView
             android:id="@+id/txtCodigo"
@@ -94,5 +83,26 @@
             tools:ignore="MissingConstraints"
             tools:layout_editor_absoluteX="63dp"
             tools:layout_editor_absoluteY="148dp" />
+        <TextView
+            android:id="@+id/txtCliente"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_marginStart="100dp"
+            android:text="Cliente"
+            tools:ignore="MissingConstraints"
+            tools:layout_editor_absoluteX="56dp"
+            tools:layout_editor_absoluteY="160dp" />
+
+        <TextView
+            android:id="@+id/txtDireccion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="70dp"
+            android:layout_marginStart="100dp"
+            android:text="Direccion"
+            tools:ignore="MissingConstraints"
+            tools:layout_editor_absoluteX="56dp"
+            tools:layout_editor_absoluteY="160dp" />
     </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

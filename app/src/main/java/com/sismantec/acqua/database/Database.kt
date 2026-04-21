@@ -22,6 +22,8 @@ class Database(context: Context) : SQLiteOpenHelper(
         db?.execSQL(tabla.tbClientes())//ejecuta la tabla clientes
         db?.execSQL(tabla.tbRutas())// ejecuta tabla rutas
         db?.execSQL(tabla.tbConfig())// ejecuta tabla config
+        //db?.execSQL(tabla.tbVersionApp()) // ejecuta tabla version app
+        db?.execSQL(tabla.empleados()) // ejecuta tabla empleados
     }
 
     override fun onUpgrade(
@@ -35,6 +37,7 @@ class Database(context: Context) : SQLiteOpenHelper(
             db?.execSQL(tabla.tbClientes())
             db?.execSQL(tabla.tbRutas())
             db?.execSQL(tabla.tbConfig())
+            db?.execSQL(tabla.empleados())
         }
     }
 }

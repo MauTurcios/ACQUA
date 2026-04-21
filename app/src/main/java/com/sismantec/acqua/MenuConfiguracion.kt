@@ -8,6 +8,7 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.health.connect.datatypes.ExercisePerformanceGoal
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -24,12 +25,14 @@ import androidx.core.content.edit
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import com.dantsu.escposprinter.BuildConfig
 import com.google.android.material.snackbar.Snackbar
 import com.sismantec.acqua.controller.ImpresionController
 import com.sismantec.acqua.databinding.ActivityMenuConfiguracionBinding
 import com.sismantec.acqua.Util.DownloadApk
 import com.sismantec.acqua.Util.SslNoSeguro
 import com.sismantec.acqua.controller.ConexionController
+import com.sismantec.acqua.database.LimpiarBD
 import com.sismantec.acqua.funciones.Funciones
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -64,6 +67,7 @@ class MenuConfiguracion : AppCompatActivity() {
     private var puertoServidor: String = ""
     private var nombreImpresor: String = ""
     private var impressionController = ImpresionController(this@MenuConfiguracion)
+    private var limpiarBD = LimpiarBD()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,7 +93,7 @@ class MenuConfiguracion : AppCompatActivity() {
         }
 
         //ACTIVANDO SWITCH DE IMRPESORES
-        binding.swBluetooth?.isChecked = preferencias.getString("tipoImpresora", "") == "BT"
+        binding.swBluetooth.isChecked = preferencias.getString("tipoImpresora", "") == "BT"
         binding.swIntegrada.isChecked = preferencias.getString("tipoImpresora", "") == "INT"
 
         permisosBluetooth()
@@ -116,11 +120,9 @@ class MenuConfiguracion : AppCompatActivity() {
             deshabilitarOpcion()
             lifecycleScope.launch(Dispatchers.IO) {
                 if (funciones.isInternetAvailable(this@MenuConfiguracion)) {
-
                     CoroutineScope(Dispatchers.IO).launch {
                         obtenerNuevaVersionApp()
                     }//COURUTINA CARGAR DATOS DE ACTUALIZACION
-
                 } else {
                     habilitarOpcion()
                     Toast.makeText(this@MenuConfiguracion, "ERROR AL VERIFICAR LA CONEXION A INTERNET", Toast.LENGTH_SHORT)
@@ -167,11 +169,11 @@ class MenuConfiguracion : AppCompatActivity() {
             preferencias.edit {
                 remove("tipoImpresora")
                 if (isChecked) {
-                    binding.swBluetooth?.isChecked = false
+                    binding.swBluetooth.isChecked = false
                     putString("tipoImpresora", "INT")
                     binding.lyImpresor.visibility = View.VISIBLE
                 } else {
-                    binding.swBluetooth?.isChecked = true
+                    binding.swBluetooth.isChecked = true
                     putString("tipoImpresora", "BT")
                     binding.lyImpresor.visibility = View.GONE
                     remove("impresorIntegrado")
@@ -201,7 +203,7 @@ class MenuConfiguracion : AppCompatActivity() {
                     Manifest.permission.BLUETOOTH_CONNECT
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
-                impressionController.imprimirRecibo(this@MenuConfiguracion)
+                //impressionController.imprimirRecibo(this@MenuConfiguracion)
             }
         }
 
@@ -301,25 +303,27 @@ class MenuConfiguracion : AppCompatActivity() {
 
         appUpdate.setOnClickListener {
             updateDialog.dismiss()
-            descargarVersionApp(urlServer,"UpdateApp_$VersionServer")
-
             //----------------------------------
             //Condicion para reiniciar BD
-            /*/----------------------------------
-            if(BuildConfig.VERSION_CODE < versionAppServer!!.toInt()){
-
+            //----------------------------------
+            Log.d("VERSION_ACTUAL_MSG_UPDATE","$versionActual")
+            Log.d("VERSION_SERVER_MSG_UPDATE","$versionAppServer")
+            if(versionActual.toDouble() < versionAppServer!!.toDouble()){
                 lifecycleScope.launch(Dispatchers.IO) {
 
-                    limpiarBD.limpiarBdAlActualizar(this@Configuracion)
+                    limpiarBD.limpiarBdAlActualizar(this@MenuConfiguracion)
                     withContext(Dispatchers.Main){
-                        descargarVersionApp(urlServer, "UpdateApp_$versionServer")
+                        descargarVersionApp(urlServer, "UpdateApp_$VersionServer")
                     }
                 }
-            }*/
+            }else{
+                descargarVersionApp(urlServer,"UpdateApp_$VersionServer")
+            }
         }
-
         cancelUpdate.setOnClickListener {
             updateDialog.dismiss()
+            habilitarOpcion()
+            isProcessing = false
         }
         updateDialog.show()
     }
@@ -376,13 +380,13 @@ class MenuConfiguracion : AppCompatActivity() {
                                 Log.d("VERSION_ACTUAL","$versionActual")
                                 Log.d("VERSION_SERVER","$versionAppServer")
                                 habilitarOpcion()
-                                alerta?.dismisss()
+                                //alerta?.dismisss()
                                 Toast.makeText(applicationContext, "NO ES NECESARIO ACTUALIZAR", Toast.LENGTH_SHORT).show()
                             }else{
                                 Log.d("VERSION_ACTUAL","$versionActual")
                                 Log.d("VERSION_SERVER","$versionAppServer")
                                 habilitarOpcion()
-                                alerta?.dismisss()
+                                //alerta?.dismisss()
                                 mensajeUpdate(versionAppServer.toString(), urlAppServer.toString())
                             }
                         }
@@ -421,7 +425,7 @@ class MenuConfiguracion : AppCompatActivity() {
         }
     }
     private fun habilitarOpcion(){
-        isProcessing = true
+        isProcessing = false
 
         binding.apply {
             btnImpresor.isEnabled = true

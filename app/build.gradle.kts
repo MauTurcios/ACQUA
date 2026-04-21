@@ -14,8 +14,8 @@ android {
         applicationId = "com.sismantec.acqua"
         minSdk = 27
         targetSdk = 36
-        versionCode = 25
-        versionName = "1.25"
+        versionCode = 12
+        versionName = "1.20"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

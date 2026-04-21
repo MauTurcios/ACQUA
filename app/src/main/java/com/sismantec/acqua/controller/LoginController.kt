@@ -8,6 +8,7 @@ import com.sismantec.acqua.funciones.Funciones
 import com.sismantec.acqua.models.LoginModel
 import com.sismantec.acqua.models.LogoutModel
 import com.sismantec.acqua.models.RespuestaLogin
+import com.sismantec.acqua.Util.SessionManager
 
 class LoginController {
 
@@ -36,6 +37,7 @@ class LoginController {
                     )
 
                     almacenarSesionUsuario(respuesta, context)
+                    //SessionManager(context).guardarUsuario(respuesta.idEmpleado, respuesta.nombreEmpleado)
                 }
             } else {
                 respuesta = RespuestaLogin(
@@ -70,6 +72,7 @@ class LoginController {
                 if (body!!.respuesta == "LOGOUT_EXITOSO") {
                     respuesta = "LOGOUT_EXITOSO"
                     eliminarSesionUsuario(context)
+                    //SessionManager(context).logout()
                 }
             } else {
                 respuesta = "LOGOUT_ERROR"
