@@ -36,6 +36,7 @@ import com.sismantec.acqua.database.AppDataBase
 import com.sismantec.acqua.funciones.Funciones
 import com.sismantec.acqua.viewmodel.clienteViewModel
 import com.sismantec.acqua.viewmodel.configViewModel
+import com.sismantec.acqua.viewmodel.lecturaViewModel
 import com.sismantec.acqua.viewmodel.rutaViewModel
 import kotlinx.coroutines.coroutineScope
 import okhttp3.Dispatcher
@@ -52,6 +53,7 @@ class CargaDatos : AppCompatActivity() {
 
     private lateinit var preferences: SharedPreferences
     private lateinit var db : AppDataBase
+    private lateinit var lecturasViewModel : lecturaViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,6 +63,7 @@ class CargaDatos : AppCompatActivity() {
         preferences = this@CargaDatos.getSharedPreferences(instancia, Context.MODE_PRIVATE)
         alert = AlertDialogo(this@CargaDatos, this)
         url = funciones.obtenerServidor(context = this@CargaDatos)
+        iniVar()
         onBackPressedDispatcher.addCallback(this) {}
 
     }
@@ -81,9 +84,19 @@ class CargaDatos : AppCompatActivity() {
                 }
             }
         }
+        binding.btnBorrarAviso.setOnClickListener {
+            lecturasViewModel.borrarAvisoCobro()
+            Toast.makeText(
+                this,
+                "Avisos eliminados",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
 
     }
-
+    private fun iniVar(){
+        lecturasViewModel = ViewModelProvider(this)[lecturaViewModel::class.java]
+    }
 
     //FUNCION PARA CARGAR CLIENTES
     private fun cargarClientes(){

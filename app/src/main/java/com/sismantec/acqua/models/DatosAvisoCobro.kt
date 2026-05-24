@@ -4,8 +4,8 @@ import com.sismantec.acqua.entities.ClientesEntity
 
 data class DatosAvisoCobro(
     val cliente: ClientesEntity,
-    val lecturaActual: Int,
-    val lecturaAnterior: Int,
-    val consumo: Int,
-    val total: Int
+    val lecturaActual: String,
+    val lecturaAnterior: String,
+    val consumo: String,
+    val total: String
 )

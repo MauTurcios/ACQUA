@@ -120,7 +120,7 @@
                 android:layout_height="75dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="15dp"
-                app:srcCompat="@drawable/factura" />
+                app:srcCompat="@drawable/ic_information" />
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView

@@ -43,5 +43,13 @@ class Tablas {
                 "id_empleado INTEGER NOT NULL," +
                 "nombre_empleado VARCHAR(50) NOT NULL);"
     }
+    fun lecturas(): String {
+        return  "CREATE TABLE lectura(" +
+                "Id INTEGER PRIMARY KEY AUTOINCREMENT,"+
+                "Id_cliente INTEGER NOT NULL,"+
+                "Lectura_anterior VARCHAR (8),"+
+                "Lectura_actual VARCHAR (8),"+
+                "Consumo VARCHAR (8);"
+    }
 
 }

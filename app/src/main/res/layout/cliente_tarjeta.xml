@@ -26,7 +26,7 @@
                 android:id="@+id/imgClienteCarta"
                 android:layout_width="75dp"
                 android:layout_height="75dp"
-                android:src="@drawable/cliente"
+                android:src="@drawable/cliente_icon"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>

@@ -119,6 +119,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"/>
 
             <Button
+                android:id="@+id/btnBorrarAviso"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="Borrar Avisos Antiguos"

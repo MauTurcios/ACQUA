@@ -91,6 +91,16 @@ class MenuClientes : AppCompatActivity() {
         actualizarTitulo()
     }
     /*
+    override fun onResume() {
+        super.onResume()
+
+        if(proviene.contains("nuevoAviso")){
+            finish()
+        }
+    }
+    */
+
+    /*
     private fun cargarDatos(){
         lifecycleScope.launch {
             clienteController.obtenerClientes(this@MenuClientes,viewModel)
@@ -118,6 +128,7 @@ class MenuClientes : AppCompatActivity() {
         clienteAdapter = ClienteAdapter {
                 cliente ->
             if(proviene.contains("nuevoAviso")){
+
                 val intent = Intent(this, AvisoCobro::class.java)
                 intent.putExtra("idCliente",cliente.Id)
                 startActivity(intent)

@@ -127,7 +127,7 @@
                 android:id="@+id/txtLectura"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:inputType="text"
+                android:inputType="numberDecimal"
                 android:textAllCaps="true"
                 android:textColor="@color/black"
                 android:textSize="18sp" />

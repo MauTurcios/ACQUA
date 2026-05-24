@@ -42,27 +42,27 @@
                 app:layout_constraintBottom_toBottomOf="parent">
 
                 <TextView
-                    android:id="@+id/Lectura"
+                    android:id="@+id/lecCodigo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin8dp"
-                    android:text="PE"
+                    android:text="EE"
                     android:textColor="@color/rojo"
                     android:textStyle="bold"/>
 
                 <TextView
-                    android:id="@+id/Direccion"
+                    android:id="@+id/lecDireccion"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin4dp"
                     android:text="Casa" />
 
                 <TextView
-                    android:id="@+id/Estado"
+                    android:id="@+id/lecConsumo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin4dp"
-                    android:text="Enviado"/>
+                    android:text="Consumo"/>
 
             </LinearLayout>
 

@@ -22,14 +22,10 @@ import com.dantsu.escposprinter.textparser.PrinterTextParserImg
 import com.sismantec.acqua.R
 import com.sismantec.acqua.funciones.Operativo
 import com.sismantec.acqua.models.DatosAvisoCobro
-import com.sismantec.acqua.database.AppDataBase
-import com.sismantec.acqua.entities.ConfigEntity
 import com.sismantec.acqua.funciones.Funciones
-import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import java.io.File
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 

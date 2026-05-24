@@ -2,6 +2,8 @@ package com.sismantec.acqua.apiservices
 
 import com.sismantec.acqua.models.Cliente
 import com.sismantec.acqua.models.ConfigModel
+import com.sismantec.acqua.models.ConsumoResponse
+import com.sismantec.acqua.models.LecturaRequest
 import com.sismantec.acqua.models.LoginModel
 import com.sismantec.acqua.models.LogoutModel
 import com.sismantec.acqua.models.RespuestaConexion
@@ -42,4 +44,11 @@ interface APIServices {
 
     @GET("config")
     suspend fun obtenerConfig() : Response<List<ConfigModel>>
+
+    @Headers("Content-Type: application/json")
+    @POST("consumo")
+    suspend fun obtenerConsumo(
+        @Body request: LecturaRequest
+    ) : Response<ConsumoResponse>
+
 }

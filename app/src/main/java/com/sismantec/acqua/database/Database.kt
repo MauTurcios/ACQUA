@@ -4,6 +4,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.sismantec.acqua.database.Tablas
+import com.sismantec.acqua.viewmodel.rutaViewModel
 
 class Database(context: Context) : SQLiteOpenHelper(
     context,
@@ -23,7 +24,8 @@ class Database(context: Context) : SQLiteOpenHelper(
         db?.execSQL(tabla.tbRutas())// ejecuta tabla rutas
         db?.execSQL(tabla.tbConfig())// ejecuta tabla config
         //db?.execSQL(tabla.tbVersionApp()) // ejecuta tabla version app
-        db?.execSQL(tabla.empleados()) // ejecuta tabla empleados
+        //db?.execSQL(tabla.empleados()) // ejecuta tabla empleados
+        db?.execSQL(tabla.lecturas())// ejecuta la tabla lecturas
     }
 
     override fun onUpgrade(
@@ -37,7 +39,8 @@ class Database(context: Context) : SQLiteOpenHelper(
             db?.execSQL(tabla.tbClientes())
             db?.execSQL(tabla.tbRutas())
             db?.execSQL(tabla.tbConfig())
-            db?.execSQL(tabla.empleados())
+            //db?.execSQL(tabla.empleados())
+            db?.execSQL(tabla.lecturas())
         }
     }
 }
