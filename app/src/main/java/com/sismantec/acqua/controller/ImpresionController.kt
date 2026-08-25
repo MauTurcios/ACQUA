@@ -34,6 +34,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import java.util.Locale
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.content.ContextCompat
@@ -195,12 +196,7 @@ class ImpresionController(private val context: Context) {
             .append("[C]CARGO FIJO\n")
             .append(String.format("[L]%-23s%9s\n", "DESCRIPCION", "VALOR"))
             .append("[L]--------------------------------\n")
-            .append(filaTablafIJO("Administracion: ",""))
-            .append(filaTablafIJO(" - Cost. Administrativos ","$3.58"))
-            .append(filaTablafIJO("Mantenimiento: ",""))
-            .append(filaTablafIJO(" - Sist. Agua Potable","$4.42"))
-            .append(filaTablafIJO(" - Alcant. Sanitario","$2.00"))
-            .append(String.format("[L]%-23s%9s\n", "TOTAL", "$10.00"))
+            .append(construirCargosFijos(datos))
             .append("[L]--------------------------------\n\n")
             .append("[C]CARGO POR CONSUMO\n")
             .append(String.format("[L]%-12s%9s%9s\n", "DESCRIPCION", "VALOR", "ALCANT."))
@@ -384,12 +380,7 @@ class ImpresionController(private val context: Context) {
                 .append("[C]CARGO FIJO\n")
                 .append(String.format("[L]%-23s%8s\n", "DESCRIPCION", "VALOR"))
                 .append("[L]-------------------------------\n")
-                .append(filaTablafIJO("Administracion: ",""))
-                .append(filaTablafIJO(" - Cost. Administrativos ","$3.58"))
-                .append(filaTablafIJO("Mantenimiento: ",""))
-                .append(filaTablafIJO(" - Sist. Agua Potable","$4.42"))
-                .append(filaTablafIJO(" - Alcant. Sanitario","$2.00"))
-                .append(String.format("[L]%-23s%8s\n", "TOTAL", "$10.00"))
+                .append(construirCargosFijos(datos))
                 .append("[L]-------------------------------\n\n")
                 .append("[C]CARGO POR CONSUMO\n")
                 .append(String.format("[L]%-12s%9s%9s\n", "DESCRIPCION", "VALOR", "ALCANT."))
@@ -458,6 +449,51 @@ class ImpresionController(private val context: Context) {
             valor.take(9),
             alcan.take(9)
         )
+    }
+
+    private data class CargoFijo(
+        val linea: String,
+        val descripcion: String,
+        val precio: Double
+    )
+
+    private fun construirCargosFijos(datos: ConsumoResponse): String {
+        val cargos = listOf(
+            CargoFijo(datos.cf1_linea, datos.cf1_descripcion, datos.cf1_precio),
+            CargoFijo(datos.cf2_linea, datos.cf2_descripcion, datos.cf2_precio),
+            CargoFijo(datos.cf3_linea, datos.cf3_descripcion, datos.cf3_precio),
+            CargoFijo(datos.cf4_linea, datos.cf4_descripcion, datos.cf4_precio),
+            CargoFijo(datos.cf5_linea, datos.cf5_descripcion, datos.cf5_precio)
+        ).filter { it.descripcion.isNotBlank() }
+
+        return buildString {
+            cargos.forEach { cargo ->
+                if (cargo.linea.isNotBlank()) {
+                    val linea = cargo.linea.trim().let {
+                        if (it.endsWith(":")) it else "$it:"
+                    }
+                    append(filaTablafIJO(linea, ""))
+                }
+
+                append(
+                    filaTablafIJO(
+                        " - ${cargo.descripcion.trim()}",
+                        formatearMoneda(cargo.precio)
+                    )
+                )
+            }
+
+            append(
+                filaTablafIJO(
+                    "TOTAL",
+                    formatearMoneda(cargos.sumOf { it.precio })
+                )
+            )
+        }
+    }
+
+    private fun formatearMoneda(valor: Double): String {
+        return String.format(Locale.US, "\$%.2f", valor)
     }
 
     //Funcion para simular una tabla
