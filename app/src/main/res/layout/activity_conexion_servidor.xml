@@ -8,6 +8,40 @@
     android:layout_height="match_parent"
     tools:context=".ConexionServidor">
 
+    <LinearLayout
+        android:id="@+id/lyEncabezado"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/alturaEncabezados"
+        android:background="@color/md_theme_light_primary"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/btnAtras"
+            android:layout_width="@dimen/estandar_55dp"
+            android:layout_height="@dimen/estandar_55dp"
+            android:layout_margin="@dimen/margin4dp"
+            android:backgroundTint="@color/md_theme_light_primary"
+            android:contentDescription="btnRegresar"
+            app:srcCompat="@drawable/outline_arrow_back_24" />
+
+        <TextView
+            android:id="@+id/lblTituloMenuCliente"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin4dp"
+            android:layout_marginStart="@dimen/margin4dp"
+            android:text="ACTUALIZAR CONEXION SERVIDOR"
+            android:textSize="@dimen/FuenteEncabezado"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cvFormularioConexionServidor"

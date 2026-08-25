@@ -16,7 +16,7 @@ import com.sismantec.acqua.entities.LecturaEntity
 
 @Database(
     entities = [ClientesEntity::class, RutasEntity::class, ConfigEntity::class, LecturaEntity::class]
-    , version = 2
+    , version = 4
     , exportSchema = false
 )
 abstract class AppDataBase : RoomDatabase() {
@@ -37,7 +37,8 @@ abstract class AppDataBase : RoomDatabase() {
                     context.applicationContext,
                     AppDataBase::class.java,
                     "Acqua.db"
-                ).build().also {
+                ).fallbackToDestructiveMigration()
+                    .build().also {
                     INSTANCE = it
                 }
             }

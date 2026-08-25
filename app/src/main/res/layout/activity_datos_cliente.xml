@@ -42,10 +42,9 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/lyDatosCliente"
-        android:layout_width="match_parent"
+        android:layout_width="415dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin8dp"
-        android:layout_marginEnd="@dimen/margin8dp"
         android:layout_marginTop="8dp"
         app:cardElevation="@dimen/margin8dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -77,18 +76,19 @@
             android:id="@+id/txtCasa"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
             android:layout_marginStart="100dp"
+            android:layout_marginTop="30dp"
             android:text="Casa"
             tools:ignore="MissingConstraints"
             tools:layout_editor_absoluteX="63dp"
             tools:layout_editor_absoluteY="148dp" />
+
         <TextView
             android:id="@+id/txtCliente"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
             android:layout_marginStart="100dp"
+            android:layout_marginTop="50dp"
             android:text="Cliente"
             tools:ignore="MissingConstraints"
             tools:layout_editor_absoluteX="56dp"
@@ -98,8 +98,8 @@
             android:id="@+id/txtDireccion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="70dp"
             android:layout_marginStart="100dp"
+            android:layout_marginTop="70dp"
             android:text="Direccion"
             tools:ignore="MissingConstraints"
             tools:layout_editor_absoluteX="56dp"

@@ -15,6 +15,8 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
+import retrofit2.http.Path
+import com.sismantec.acqua.models.PeriodoModel
 
 interface APIServices {
 
@@ -46,9 +48,14 @@ interface APIServices {
     suspend fun obtenerConfig() : Response<List<ConfigModel>>
 
     @Headers("Content-Type: application/json")
-    @POST("consumo")
-    suspend fun obtenerConsumo(
+    @POST("procesarlectura")
+    suspend fun procesarLectura(
         @Body request: LecturaRequest
     ) : Response<ConsumoResponse>
+
+    @GET("periodo/{id}")
+    suspend fun obtenerPeriodo(
+        @Path("id") idPeriodo: Int
+    ): Response<PeriodoModel>
 
 }

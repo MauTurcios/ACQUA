@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.WindowManager
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -17,9 +18,11 @@ class SplashScreen : AppCompatActivity() {
         setContentView(R.layout.activity_splash_screen)
 
         val prefs = getSharedPreferences("CONFIG_SERVIDOR", Context.MODE_PRIVATE)
+        val periodo_prefs = getSharedPreferences("PERIODO_PREFACTURA", Context.MODE_PRIVATE)
         val ip = prefs.getString("ip",null)
         val puerto = prefs.getString("puerto", null)
         val empleado = prefs.getString("nombreEmpleado", null)
+        val periodo_id = periodo_prefs.getInt("id_periodo",0)
 
         window.setFlags(
             WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -39,6 +42,10 @@ class SplashScreen : AppCompatActivity() {
                 startActivity(intent)
                 finish()
 
+            }else if(periodo_id == 0) {
+                val intent = Intent  (this, Periodo::class.java)
+                startActivity(intent)
+                finish()
             }else{
                 val intent = Intent(this, Inicio::class.java)
                 startActivity(intent)

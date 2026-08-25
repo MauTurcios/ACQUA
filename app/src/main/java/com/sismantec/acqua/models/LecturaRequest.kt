@@ -1,5 +1,10 @@
 package com.sismantec.acqua.models
 
+import java.math.BigDecimal
+
 data class LecturaRequest(
-    val lectura : String
+    val cuenta: String,
+    val idLectura: Int,
+    val lectura_actual: Double,
+    val empleado: String
 )

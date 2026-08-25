@@ -2,14 +2,18 @@ package com.sismantec.acqua
 
 import android.Manifest
 import android.app.Dialog
+import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
@@ -18,17 +22,26 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.snackbar.Snackbar
 import com.sismantec.acqua.controller.ImpresionController
 import com.sismantec.acqua.databinding.ActivityMenuConfiguracionBinding
 import com.sismantec.acqua.Util.DownloadApk
+import com.sismantec.acqua.Util.PeriodoPreferences
 import com.sismantec.acqua.Util.SslNoSeguro
 import com.sismantec.acqua.controller.ConexionController
+import com.sismantec.acqua.controller.PeriodoController
 import com.sismantec.acqua.database.LimpiarBD
+import com.sismantec.acqua.factorie.ConfiguracionViewModelFactory
 import com.sismantec.acqua.funciones.Funciones
+import com.sismantec.acqua.repository.BluetoothRepository
+import com.sismantec.acqua.viewmodel.configViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
@@ -53,12 +66,18 @@ class MenuConfiguracion : AppCompatActivity() {
     private lateinit var cancelUpdate: TextView
     private lateinit var binding: ActivityMenuConfiguracionBinding
     private val instancia = "CONFIG_SERVIDOR"
+    private val instancia_periodo = "PERIODO_PREFACTURA"
     private lateinit var preferencias: SharedPreferences
+    private lateinit var periodo_prefs: SharedPreferences
     private var ipServidor: String = ""
     private var puertoServidor: String = ""
     private var nombreImpresor: String = ""
+    private var nombreEmpresa: String = ""
+    private var idPeriodo: Int =0
     private var impressionController = ImpresionController(this@MenuConfiguracion)
     private var limpiarBD = LimpiarBD()
+    private var periodoController = PeriodoController()
+    private lateinit var confViewModel: configViewModel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,17 +85,29 @@ class MenuConfiguracion : AppCompatActivity() {
         binding = ActivityMenuConfiguracionBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Configuracion ViewModel
+        val bluetoothRepository = BluetoothRepository()
+        val configFactory = ConfiguracionViewModelFactory(bluetoothRepository)
+        confViewModel = ViewModelProvider(this,configFactory)[configViewModel::class.java]
+        observarBluetoothViewModel()
+        permisosBluetooth()
+
         preferencias = getSharedPreferences(instancia, Context.MODE_PRIVATE)
+        periodo_prefs = getSharedPreferences(instancia_periodo, Context.MODE_PRIVATE)
         ipServidor = preferencias.getString("ip", "").toString()
         puertoServidor = preferencias.getString("puerto", "").toString()
         nombreImpresor = preferencias.getString("impresorIntegrado", "noImpresor").toString()
-
-        //Seteando el Puerto y la Ip del Servidor
+        nombreEmpresa = preferencias.getString("dteNombreComercial", "").toString()
+        idPeriodo = periodo_prefs.getInt("id_periodo",0)
+        //Seteando el Puerto y la Ip del Servidor y el nombre comercial de la empresa
         binding.txtip.setText(ipServidor)
         binding.txtip.isEnabled = false
         binding.txtpuerto.setText(puertoServidor)
         binding.txtpuerto.isEnabled = false
-        binding.txtImpresor.setText(nombreImpresor)
+        //binding.txtImpresor.setText(nombreImpresor)
+        binding.texempresa.isEnabled = false
+        binding.texempresa.setText(nombreEmpresa)
+        alerta = AlertDialogo(this@MenuConfiguracion, this)
 
         //Ocultando Controles de Impresor
         if(preferencias.getString("tipoImpresora", "") == "BT"){
@@ -86,8 +117,6 @@ class MenuConfiguracion : AppCompatActivity() {
         //ACTIVANDO SWITCH DE IMRPESORES
         binding.swBluetooth.isChecked = preferencias.getString("tipoImpresora", "") == "BT"
         binding.swIntegrada.isChecked = preferencias.getString("tipoImpresora", "") == "INT"
-
-        permisosBluetooth()
 
         // Recuperar la imagen guardada al iniciar
         val prefs = getSharedPreferences("MisImagenes", MODE_PRIVATE)
@@ -122,6 +151,10 @@ class MenuConfiguracion : AppCompatActivity() {
             }
         }
 
+        binding.btnVerificarPeriodo.setOnClickListener {
+            verificarPeriodo()
+        }
+
         //VERSION APP
         versionActualApp()
         binding.lblVersionApp.text = "ACQUA APP Ver. $versionActual"
@@ -134,6 +167,13 @@ class MenuConfiguracion : AppCompatActivity() {
 
         binding.btnAtras.setOnClickListener {
             val intent = Intent(this@MenuConfiguracion, Inicio::class.java)
+            startActivity(intent)
+            finish()
+        }
+
+        binding.btnConfigServidor.setOnClickListener {
+            val intent = Intent(this@MenuConfiguracion, ConexionServidor::class.java)
+            intent.putExtra("proviene", "actualizaConexion")
             startActivity(intent)
             finish()
         }
@@ -175,27 +215,26 @@ class MenuConfiguracion : AppCompatActivity() {
 
         binding.btnImpresor.setOnClickListener {
 
-            val impresor = binding.txtImpresor.text
+            val impresor = nombreImpresor
 
-            preferencias.edit{
-                remove("impresorIntegrado")
-                putString("impresorIntegrado", impresor.toString())
+            if (impresor.isNotEmpty() && impresor != "-- NO SE ENCONTRARON IMPRESORAS --"){
+                preferencias.edit{
+                    remove("impresorIntegrado")
+                    putString("impresorIntegrado", impresor)
+                    Toast.makeText(this@MenuConfiguracion, "IMPRESOR CONFIGURADO", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }else{
+                Toast.makeText(this@MenuConfiguracion, "ERROR: SELECCIONE UNA IMPRESORA VÁLIDA", Toast.LENGTH_SHORT).show()
             }
-
-            Toast.makeText(this@MenuConfiguracion, "IMPRESOR CONFIGURADO", Toast.LENGTH_SHORT)
-                .show()
         }
 
-        binding.btnPruebaImpresion.setOnClickListener @androidx.annotation.RequiresPermission(
-            android.Manifest.permission.BLUETOOTH_CONNECT
-        ) {
-            if (ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.BLUETOOTH_CONNECT
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                //impressionController.imprimirRecibo(this@MenuConfiguracion)
+        binding.spImpresorasVinculadas.onItemSelectedListener = object :
+            AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                nombreImpresor = parent?.getItemAtPosition(position).toString()
             }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
 
         binding.imgLogoEmpresa.setOnClickListener {
@@ -207,6 +246,19 @@ class MenuConfiguracion : AppCompatActivity() {
 
     //Funcion para los permisos Bluetooth
     private fun permisosBluetooth() {
+        if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.S){
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) !=
+                PackageManager.PERMISSION_GRANTED){
+
+                requestBluetoothPermissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT)
+            }else{
+                confViewModel.cargarImpresoras()
+            }
+        }else{
+            confViewModel.cargarImpresoras()
+        }
+
+        /*
         val permissions = when {
             android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S -> {
                 arrayOf(
@@ -231,7 +283,16 @@ class MenuConfiguracion : AppCompatActivity() {
         } else {
             //Toast.makeText(this, "Permisos Bluetooth concedidos ✅", Toast.LENGTH_SHORT).show()
         }
+         */
     }
+    private val requestBluetoothPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (isGranted) {
+                confViewModel.cargarImpresoras()
+            } else {
+                Toast.makeText(this, "PERMISO DE BLUETOOTH DENEGADO", Toast.LENGTH_LONG).show()
+            }
+        }
 
     private fun seleccionarImagen() {
         seleccionarImagenLauncher.launch("image/*") // solo permite imágenes
@@ -371,13 +432,13 @@ class MenuConfiguracion : AppCompatActivity() {
                                 Log.d("VERSION_ACTUAL","$versionActual")
                                 Log.d("VERSION_SERVER","$versionAppServer")
                                 habilitarOpcion()
-                                //alerta?.dismisss()
+                                alerta?.dismisss()
                                 Toast.makeText(applicationContext, "NO ES NECESARIO ACTUALIZAR", Toast.LENGTH_SHORT).show()
                             }else{
                                 Log.d("VERSION_ACTUAL","$versionActual")
                                 Log.d("VERSION_SERVER","$versionAppServer")
                                 habilitarOpcion()
-                                //alerta?.dismisss()
+                                alerta?.dismisss()
                                 mensajeUpdate(versionAppServer.toString(), urlAppServer.toString())
                             }
                         }
@@ -412,7 +473,6 @@ class MenuConfiguracion : AppCompatActivity() {
         binding.apply {
             btnImpresor.isEnabled = false
             btnUpdateApp.isEnabled = false
-            btnPruebaImpresion.isEnabled = false
         }
     }
     private fun habilitarOpcion(){
@@ -421,12 +481,81 @@ class MenuConfiguracion : AppCompatActivity() {
         binding.apply {
             btnImpresor.isEnabled = true
             btnUpdateApp.isEnabled = true
-            btnPruebaImpresion.isEnabled = true
         }
+    }
+
+    private fun verificarPeriodo(){
+        alerta?.Cargando()
+        if (isProcessing) return
+
+        isProcessing = true
+        deshabilitarOpcion()
+
+        lifecycleScope.launch {
+            delay (300)
+            runOnUiThread {
+                alerta?.changeText("VERIFICANDO PERIODO")
+            }
+
+            val periodo = periodoController.verificarPeriodo(idPeriodo,this@MenuConfiguracion)
+            if (!periodo){
+                val periodoPrefs = PeriodoPreferences(this@MenuConfiguracion)
+                periodoPrefs.limpiarPeriodo()
+                Toast.makeText(this@MenuConfiguracion, "EL PERIODO YA NO ESTÁ ACTIVO", Toast.LENGTH_LONG).show()
+                isProcessing = false
+                habilitarOpcion()
+                startActivity(
+                    Intent(
+                        this@MenuConfiguracion, Periodo::class.java))
+                finish()
+            }else{
+                isProcessing = false
+                habilitarOpcion()
+                Toast.makeText(this@MenuConfiguracion, "EL PERIODO SE ENCUENTRA ACTIVO", Toast.LENGTH_LONG).show()
+            }
+            runOnUiThread {
+                alerta?.dismisss()
+            }
+        }
+    }
+
+    private fun observarBluetoothViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED){
+                confViewModel.listaImpresoras.collect { lista ->
+                    actualizarSpinnerImpresoras(lista)
+                }
+            }
+        }
+    }
+
+    private fun actualizarSpinnerImpresoras(lista: List<String>){
+        val displayList = if (lista.isEmpty()) {
+            listOf("-- NO SE ENCONTRARON IMPRESORAS --")
+        } else {
+            lista
+        }
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, displayList)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spImpresorasVinculadas.adapter = adapter
+
+        // Autoseleccionar la impresora guardada en preferencias
+        val guardada = preferencias!!.getString("impresorIntegrado", "")
+        if (!guardada.isNullOrEmpty() && lista.contains(guardada)) {
+            val position = lista.indexOf(guardada)
+            binding.spImpresorasVinculadas.setSelection(position)
+        }
+
     }
 
     private fun ShowAlert(mensaje: String) {
         val alert: Snackbar = Snackbar.make(binding.vistaalerta, mensaje, Snackbar.LENGTH_LONG)
+        alert.view.setBackgroundColor(ContextCompat.getColor(this@MenuConfiguracion, R.color.moderado))
+        alert.show()
+    }
+
+    private fun ShowAlertPeriodo(mensaje: String){
+        val alert: Snackbar = Snackbar.make(binding.vistaalertaperiodo, mensaje, Snackbar.LENGTH_LONG)
         alert.view.setBackgroundColor(ContextCompat.getColor(this@MenuConfiguracion, R.color.moderado))
         alert.show()
     }

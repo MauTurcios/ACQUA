@@ -15,7 +15,7 @@ android {
         minSdk = 27
         targetSdk = 36
         versionCode = 13
-        versionName = "1.30"
+        versionName = "1.36"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -74,7 +74,12 @@ dependencies {
     implementation ("androidx.room:room-ktx:2.6.1")
 
     // LiveData con soporte a coroutines
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
+    //implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
+
+    //ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.5")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.5")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.5")
 
     // ViewModel + coroutines
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")

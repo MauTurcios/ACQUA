@@ -105,7 +105,7 @@
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cvConexionServidor"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="290dp"
                     android:layout_margin="16dp"
                     android:minHeight="225dp"
                     app:cardBackgroundColor="@color/white"
@@ -130,6 +130,15 @@
                             android:textStyle="bold"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                        <ImageView
+                            android:id="@+id/btnConfigServidor"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/ic_configuracion"
+                            android:layout_marginTop="@dimen/margin8dp"
+                            android:layout_marginEnd="@dimen/margin8dp"
+                            app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
                         <com.google.android.material.textfield.TextInputLayout
@@ -173,11 +182,36 @@
                                 android:inputType="text"
                                 android:textColor="@color/black"
                                 android:textSize="18sp" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/lyEmpresa"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="16dp"
+                            android:hint="EMPRESA"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/lyPuerto">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/texempresa"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="text"
+                                android:textColor="@color/black"
+                                android:textSize="18sp" />
+
                         </com.google.android.material.textfield.TextInputLayout>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
+
+
                 </androidx.cardview.widget.CardView>
+
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/lyImpresion"
@@ -318,25 +352,18 @@
                                 android:layout_marginBottom="@dimen/marginDefault"
                                 android:orientation="vertical">
 
-                                <com.google.android.material.textfield.TextInputLayout
-                                    android:id="@+id/lyNombreImpresor"
-                                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                                <LinearLayout
+                                    android:id="@+id/lySpinnerImpresor"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_margin="16dp"
-                                    android:hint="NOMBRE IMPRESOR"
-                                    app:layout_constraintEnd_toEndOf="parent"
-                                    app:layout_constraintStart_toStartOf="parent"
-                                    app:layout_constraintTop_toBottomOf="@+id/lyIp">
+                                    android:background="@drawable/spinner_bg">
 
-                                    <com.google.android.material.textfield.TextInputEditText
-                                        android:id="@+id/txtImpresor"
+                                    <Spinner
+                                        android:id="@+id/spImpresorasVinculadas"
                                         android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:inputType="text"
-                                        android:textColor="@color/black"
-                                        android:textSize="18sp" />
-                                </com.google.android.material.textfield.TextInputLayout>
+                                        android:layout_height="55dp" />
+                                </LinearLayout>
 
                                 <Button
                                     android:id="@+id/btnImpresor"
@@ -361,7 +388,7 @@
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/lyUpdateApp"
+                    android:id="@+id/lyVerificarPeriodo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
@@ -375,6 +402,64 @@
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
+                        android:layout_height="115dp">
+
+                        <TextView
+                            android:id="@+id/textVerificaPeriodo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/marginDefault"
+                            android:text="VERIFICAR PERIODO ACTIVO"
+                            android:textAlignment="center"
+                            android:textColor="@color/black"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <Button
+                            android:id="@+id/btnVerificarPeriodo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/marginDefault"
+                            android:layout_marginTop="@dimen/marginDefault"
+                            android:layout_marginEnd="@dimen/marginDefault"
+                            android:text="VERIFICAR PERIODO"
+                            android:textColor="@color/white"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:backgroundTint="@color/btnAzul_bk"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/textVerificaPeriodo" />
+
+                        <view
+                            android:id="@+id/vistaalertaperiodo"
+                            class="androidx.appcompat.widget.ActionMenuView"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/lyUpdateApp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginEnd="16dp"
+                    app:cardBackgroundColor="@color/white"
+                    app:cardElevation="5dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/lyVerificarPeriodo">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
                         android:layout_height="145dp">
 
                         <TextView
@@ -382,7 +467,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_margin="@dimen/marginDefault"
-                            android:text="UPDATE APP"
+                            android:text="ACTUALIZAR APP"
                             android:textAlignment="center"
                             android:textColor="@color/black"
                             android:textSize="20sp"
@@ -429,22 +514,6 @@
                             app:layout_constraintStart_toStartOf="parent" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.cardview.widget.CardView>
-
-                <Button
-                    android:id="@+id/btnPruebaImpresion"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/marginDefault"
-                    android:layout_marginTop="@dimen/marginDefault"
-                    android:layout_marginEnd="@dimen/marginDefault"
-                    android:backgroundTint="@color/design_default_color_error"
-                    android:text="PRUEBA DE IMPRESION"
-                    android:textColor="@color/white"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/lyUpdateApp" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
     </ScrollView>

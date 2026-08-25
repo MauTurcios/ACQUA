@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sismantec.acqua.adapter.LecturaAdapter
 import com.sismantec.acqua.databinding.ActivityMenuAvisosCobrosBinding
 import com.sismantec.acqua.entities.LecturaEntity
-import com.sismantec.acqua.models.LecturaResumen
 import com.sismantec.acqua.viewmodel.lecturaViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,7 +21,7 @@ class MenuAvisosCobros : AppCompatActivity() {
 
     private lateinit var binding: ActivityMenuAvisosCobrosBinding
     private lateinit var lecturaAdapter: LecturaAdapter
-    private var listadoAvisosCobros: List<LecturaResumen> = listOf()
+    private var listadoAvisosCobros: List<LecturaEntity> = listOf()
     private var preferences: SharedPreferences? = null
     private val instancia = "CONFIG_SERVIDOR"
     private var mainAvisosCobros: ConstraintLayout? = null
@@ -32,10 +31,10 @@ class MenuAvisosCobros : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMenuAvisosCobrosBinding.inflate(layoutInflater)
-        iniVar()
-        observersVM()
         setContentView(binding.root)
+        iniVar()
         mostrarAvisos()
+        observersVM()
         onBackPressedDispatcher.addCallback(this) {}
     }
 
@@ -49,8 +48,8 @@ class MenuAvisosCobros : AppCompatActivity() {
         }
 
         binding.btnNuevoAviso.setOnClickListener {
-            val intent = Intent(this@MenuAvisosCobros, MenuClientes::class.java)
-            intent.putExtra("proviene", "nuevoAviso")
+            val intent = Intent(this@MenuAvisosCobros, AvisoCobro::class.java)
+            //intent.putExtra("proviene", "nuevoAviso")
             startActivity(intent)
             finish()
         }
@@ -62,15 +61,30 @@ class MenuAvisosCobros : AppCompatActivity() {
     }
     private fun iniVar(){
         lecturasViewModel = ViewModelProvider(this)[lecturaViewModel::class.java]
+        recicle = binding.listadoAvisos
     }
 
     private fun mostrarAvisos() {
+
+        lecturaAdapter = LecturaAdapter {
+            lectura ->
+            val intent = Intent(this@MenuAvisosCobros, AvisoCobroDetalle::class.java)
+            intent.putExtra("Id_lectura_detalle", lectura.id)
+            intent.putExtra("estado_lectura",lectura.Lectura_enviada)
+            startActivity(intent)
+            finish()
+        }
+        recicle?.adapter = lecturaAdapter
+        recicle?.layoutManager = LinearLayoutManager(this@MenuAvisosCobros)
+
+        /*
         lecturaAdapter = LecturaAdapter(listadoAvisosCobros)
 
         binding.listadoClientes.apply {
             layoutManager = LinearLayoutManager(this@MenuAvisosCobros)
             adapter = lecturaAdapter
         }
+         */
     }
     private fun observersVM() {
 

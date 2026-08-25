@@ -1,6 +1,7 @@
 package com.sismantec.acqua.database
 
 class Tablas {
+    /*
     fun tbClientes(): String {
         return  "CREATE TABLE Clientes(" +
                 "Id INTEGER  PRIMARY KEY NOT NULL," +
@@ -17,6 +18,7 @@ class Tablas {
                 "Id INTEGER PRIMARY KEY NOT NULL," +
                 "Ruta VARCHAR(50) NOT NULL);"
     }
+     */
     fun tbConfig(): String{
         return "CREATE TABLE Config("+
                 "Id INTEGER PRIMARY KEY NOT NULL," +
@@ -33,23 +35,34 @@ class Tablas {
                 "dteTelefono Varchar(30)  NULL,"+
                 "dteCorreo Varchar(100)  NULL);"
     }
+    /*
     fun tbVersionApp(): String{
         return "CREATE TABLE VersionApp("+
                 "Id INTEGER PRIMARY KEY NOT NULL," +
                 "VersionApp VARCHAR(25) NULL);"
     }
-    fun empleados(): String {
-        return "CREATE TABLE empleado(" +
-                "id_empleado INTEGER NOT NULL," +
-                "nombre_empleado VARCHAR(50) NOT NULL);"
-    }
+     */
     fun lecturas(): String {
         return  "CREATE TABLE lectura(" +
                 "Id INTEGER PRIMARY KEY AUTOINCREMENT,"+
-                "Id_cliente INTEGER NOT NULL,"+
+                "Id_servicio INTEGER NOT NULL,"+
+                "Codigo_cliente VARCHAR(25)  NOT NULL,"+
+                "Id_periodo INTEGER NOT NULL"+
                 "Lectura_anterior VARCHAR (8),"+
                 "Lectura_actual VARCHAR (8),"+
-                "Consumo VARCHAR (8);"
+                "Consumo VARCHAR (8),"+
+                "Total INTEGER NOT NULL,"+
+                "Enviado VARCHAR(1);"
     }
+
+    /*
+    fun periodo(): String{
+        return "CREATE TABLE periodo("+
+                "Id INTEGER PRIMARY KEY AUTOINCREMENT,"+
+                "Periodofin_inicio DATE"+
+                "Periodo_al DATE"+
+                "Estado VARCHAR (1)"
+    }
+     */
 
 }

@@ -31,11 +31,11 @@ import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import com.sismantec.acqua.databinding.ActivityCargaDatosBinding
 import  com.sismantec.acqua.controller.ClientesController
+import com.sismantec.acqua.controller.LoginController
 import com.sismantec.acqua.dao.ConfigDAO
 import com.sismantec.acqua.database.AppDataBase
 import com.sismantec.acqua.funciones.Funciones
 import com.sismantec.acqua.viewmodel.clienteViewModel
-import com.sismantec.acqua.viewmodel.configViewModel
 import com.sismantec.acqua.viewmodel.lecturaViewModel
 import com.sismantec.acqua.viewmodel.rutaViewModel
 import kotlinx.coroutines.coroutineScope
@@ -49,6 +49,7 @@ class CargaDatos : AppCompatActivity() {
     private var alert: AlertDialogo?=null
     private var instancia = "CONFIG_SERVIDOR"
     private var clientesController = ClientesController()
+    private var loginController = LoginController()
     private var funciones = Funciones()
 
     private lateinit var preferences: SharedPreferences
@@ -103,7 +104,6 @@ class CargaDatos : AppCompatActivity() {
         alert!!.Cargando()
         val viewModel = ViewModelProvider(this)[clienteViewModel::class.java]
         val rutaViewModel = ViewModelProvider(this)[rutaViewModel::class.java]
-        val configViewModel = ViewModelProvider(this)[configViewModel::class.java]
         lifecycleScope.launch{
             delay(300)
             alert!!.changeText("CARGANDO CLIENTES")
@@ -117,13 +117,6 @@ class CargaDatos : AppCompatActivity() {
                 clientesController.obtenerRutas(this@CargaDatos, rutaViewModel)
             }catch (e: Exception){
                 println("ERROR AL CARGAR RUTAS" + e.message)
-            }
-            //PRUEBA DE CARGA DE LA CONFIG
-            alert!!.changeText("CARGANDO CONFIG")
-            try {
-                clientesController.obtenerConfig(this@CargaDatos,configViewModel)
-            }catch (e: Exception){
-                println("ERROR AL CARGAR CONFIG" + e.message)
             }
             //FIN DE CARGA DE LA CONFIG
             alert!!.changeText("INFORMACIÓN CARGADA CORRECTAMENTE")

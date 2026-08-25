@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.sismantec.acqua.database.Tablas
 import com.sismantec.acqua.viewmodel.rutaViewModel
+import kotlin.math.tan
 
 class Database(context: Context) : SQLiteOpenHelper(
     context,
@@ -20,12 +21,13 @@ class Database(context: Context) : SQLiteOpenHelper(
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
-        db?.execSQL(tabla.tbClientes())//ejecuta la tabla clientes
-        db?.execSQL(tabla.tbRutas())// ejecuta tabla rutas
+        //db?.execSQL(tabla.tbClientes())//ejecuta la tabla clientes
+        //db?.execSQL(tabla.tbRutas())// ejecuta tabla rutas
         db?.execSQL(tabla.tbConfig())// ejecuta tabla config
         //db?.execSQL(tabla.tbVersionApp()) // ejecuta tabla version app
         //db?.execSQL(tabla.empleados()) // ejecuta tabla empleados
         db?.execSQL(tabla.lecturas())// ejecuta la tabla lecturas
+        //db?.execSQL(tabla.periodo()) //ejecuta la tabla periodo
     }
 
     override fun onUpgrade(
@@ -36,11 +38,12 @@ class Database(context: Context) : SQLiteOpenHelper(
         if(oldVersion < newVersion){
             //CREANDO TABLA SIN ELIMINAR LA ANTERIOR BD
             //HABILITAR CON LA VERSION DE LA BD EN 2
-            db?.execSQL(tabla.tbClientes())
-            db?.execSQL(tabla.tbRutas())
+            //db?.execSQL(tabla.tbClientes())
+            //db?.execSQL(tabla.tbRutas())
             db?.execSQL(tabla.tbConfig())
             //db?.execSQL(tabla.empleados())
             db?.execSQL(tabla.lecturas())
+            //db?.execSQL(tabla.periodo())
         }
     }
 }

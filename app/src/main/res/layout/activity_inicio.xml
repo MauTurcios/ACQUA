@@ -11,44 +11,55 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/lyHeaderInicio"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:orientation="vertical"
+        android:layout_height="wrap_content"
         android:background="@drawable/bg_header_inicio"
+        android:orientation="vertical"
         android:padding="@dimen/marginDefault"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/imgGota"
             android:layout_width="32dp"
             android:layout_height="32dp"
+            android:layout_marginTop="@dimen/margin8dp"
             android:contentDescription="imgGota"
             android:src="@drawable/gota"
-            android:layout_marginTop="@dimen/margin8dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/lblTituloApp"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="32dp"
-            android:textColor="@color/white"
+            android:layout_marginTop="@dimen/margin8dp"
+            android:gravity="center_vertical"
             android:text="ACQUA Móvil"
+            android:textColor="@color/white"
             android:textSize="25sp"
             android:textStyle="bold"
-            android:gravity="center_vertical"
-            android:layout_marginTop="@dimen/margin8dp"
             app:layout_constraintStart_toEndOf="@+id/imgGota"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/lblEmpleado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="20dp"
+            android:text="Antonio Hernández"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            app:layout_constraintStart_toEndOf="@id/lblTituloApp"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/lblPeriodo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/marginDouble"
-            android:text="Antonio Hernández"
+            android:text="PERIODO ACTIVO DEL 01-01-1900 AL 01-01-1900"
             android:textColor="@color/white"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -60,12 +71,12 @@
             android:id="@+id/imgConfigMovil"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:contentDescription="imgConfigMovil"
-            android:src="@drawable/configmovil"
             android:layout_marginTop="@dimen/margin8dp"
             android:layout_marginEnd="@dimen/margin8dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            android:contentDescription="imgConfigMovil"
+            android:src="@drawable/configmovil"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -120,11 +131,11 @@
                 android:layout_height="75dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="15dp"
-                app:srcCompat="@drawable/ic_information" />
+                app:srcCompat="@drawable/bill" />
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/cvClientes"
+            android:id="@+id/cvConfig"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginLeft="10dp"
@@ -135,12 +146,12 @@
             app:cardCornerRadius="@dimen/CornerRadiusDefault">
 
             <TextView
-                android:id="@+id/lblpedidos"
+                android:id="@+id/lblConfig"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal|center_vertical"
                 android:layout_marginTop="35dp"
-                android:text="Clientes"
+                android:text="Configuracion"
                 android:textColor="@color/gris_oscuro"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -151,7 +162,7 @@
                 android:layout_height="75dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="15dp"
-                app:srcCompat="@drawable/clientes" />
+                app:srcCompat="@drawable/config" />
         </androidx.cardview.widget.CardView>
     </LinearLayout>
 
@@ -194,7 +205,7 @@
                 android:layout_height="75dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="15dp"
-                app:srcCompat="@drawable/server" />
+                app:srcCompat="@drawable/icon_cloud" />
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView

@@ -23,7 +23,6 @@ import com.sismantec.acqua.entities.ConfigEntity
 import com.sismantec.acqua.entities.RutasEntity
 import com.sismantec.acqua.models.Cliente
 import com.sismantec.acqua.viewmodel.clienteViewModel
-import com.sismantec.acqua.viewmodel.configViewModel
 import com.sismantec.acqua.viewmodel.rutaViewModel
 import kotlinx.coroutines.processNextEventInCurrentThread
 import java.net.IDN
@@ -88,35 +87,6 @@ class ClientesController {
         }
     }
 
-    suspend fun obtenerConfig(context: Context, configViewModel: configViewModel) = withContext(Dispatchers.IO){
-        val baseUrl = funciones.obtenerServidor(context)
-        val api = RetrofitCliente.obtenerApi(baseUrl)
-        try {
-            val respuesta = api.obtenerConfig()
-            if(respuesta.isSuccessful()){
-                val config = respuesta.body()?: emptyList()
-                val conf = config.map {
-                    ConfigEntity(
-                        Id = it.Id,
-                        dtePais = it.dtePais,
-                        dteDepto = it.dteDepto,
-                        dteMunicipio = it.dteMunicipio,
-                        dteDistrito = it.dteDistrito,
-                        dteNit = it.dteNit,
-                        dteNrc = it.dteNrc,
-                        dteEmisor = it.dteNombreEmisor,
-                        dteGiro = it.dteGiro,
-                        dteNombreComercial = it.dteNombreComercial,
-                        dteDireccion = it.dteDireccion,
-                        dteTelefono = it.dteTelefono,
-                        dteCorreo = it.dteCorreo
-                    )
-                }
-                configViewModel.insertarConfig(conf)
-            }
-        }catch (e: Exception){
-            println("ERROR AL OBTENER LA CONFIGURACIÓN -> " + e.message)
-        }
-    }
+
 }
 

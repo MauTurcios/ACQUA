@@ -187,4 +187,5 @@
     <string name="logo_server">logo_server</string>
     <string name="datos_de_conexi_n">DATOS DE CONEXIÓN</string>
     <string name="informacioncliente">InformacionCliente</string>
+    <string name="id_periodo">ID PERIODO</string>
 </resources>

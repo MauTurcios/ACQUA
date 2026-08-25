@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.enableEdgeToEdge
@@ -11,8 +12,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import com.sismantec.acqua.Util.SessionManager
+import com.sismantec.acqua.Util.PeriodoPreferences
 import com.sismantec.acqua.controller.LoginController
 import com.sismantec.acqua.databinding.ActivityInicioBinding
 import kotlinx.coroutines.Dispatchers
@@ -23,21 +25,29 @@ class Inicio : AppCompatActivity() {
 
     private lateinit var binding: ActivityInicioBinding
     private val instancia = "CONFIG_SERVIDOR"
+    private val periodo_instancia = "PERIODO_PREFACTURA"
     private lateinit var preferencias: SharedPreferences
+    private lateinit var periodo_prefs: SharedPreferences
     private var vendedor : String = ""
     private var idVendedor : Int = 0
     private var logincontroller = LoginController()
+    private var periodo_inicio: String = ""
+    private var periodo_fin: String = ""
+    private var periodo_concepto: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityInicioBinding.inflate(layoutInflater)
+        binding.imgConfigMovil.isVisible = false
         setContentView(binding.root)
         onBackPressedDispatcher.addCallback(this) {}
         preferencias = getSharedPreferences(instancia, Context.MODE_PRIVATE)
+        periodo_prefs = getSharedPreferences(periodo_instancia, MODE_PRIVATE)
         vendedor = preferencias.getString("nombreEmpleado", "").toString()
         idVendedor = preferencias.getInt("idEmpleado", 0).toInt()
-
-
+        periodo_inicio = periodo_prefs.getString("periodo_inicio", "").toString()
+        periodo_fin = periodo_prefs.getString("periodo_fin", "").toString()
+        periodo_concepto = periodo_prefs.getString("concepto","").toString()
     }
 
     override fun onStart() {
@@ -51,8 +61,8 @@ class Inicio : AppCompatActivity() {
             menuAvisoCobro()
         }
 
-        binding.cvClientes.setOnClickListener {
-            menuClientes()
+        binding.cvConfig.setOnClickListener {
+            menuConfiguracion()
         }
 
         binding.cvSalir.setOnClickListener {
@@ -61,9 +71,11 @@ class Inicio : AppCompatActivity() {
 
         binding.lblEmpleado.text = vendedor
 
-        binding.imgConfigMovil.setOnClickListener {
+        binding.lblPeriodo.text = periodo_concepto
+
+        /*binding.imgConfigMovil.setOnClickListener {
             menuConfiguracion()
-        }
+        }*/
 
     }
 
