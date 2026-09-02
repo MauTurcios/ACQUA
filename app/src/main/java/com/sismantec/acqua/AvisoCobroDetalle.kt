@@ -1,11 +1,12 @@
 package com.sismantec.acqua
 
-import android.content.Context
+import android.app.Dialog
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -15,8 +16,6 @@ import com.sismantec.acqua.databinding.ActivityLecturaDetalleBinding
 import com.sismantec.acqua.entities.LecturaEntity
 import com.sismantec.acqua.funciones.Funciones
 import com.sismantec.acqua.viewmodel.lecturaViewModel
-import android.app.Dialog
-import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.sismantec.acqua.apiservices.RetrofitCliente
@@ -24,15 +23,7 @@ import com.sismantec.acqua.controller.ImpresionController
 import com.sismantec.acqua.models.LecturaRequest
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import android.Manifest
-import android.content.pm.PackageManager
-import android.os.Build
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
-import com.sismantec.acqua.factorie.ConfiguracionViewModelFactory
 import com.sismantec.acqua.models.ConsumoResponse
-import com.sismantec.acqua.repository.BluetoothRepository
-import com.sismantec.acqua.viewmodel.configViewModel
 
 class AvisoCobroDetalle: AppCompatActivity() {
     private lateinit var binding: ActivityLecturaDetalleBinding
@@ -57,7 +48,6 @@ class AvisoCobroDetalle: AppCompatActivity() {
         binding.btnEnviarPendiente.isVisible = false
         binding.btnImprimirAviso.isVisible = false
         iniVar()
-        idLecturaDetalle = intent.getIntExtra("Id_lectura_detalle", 0)
         cargarDatosLectura()
         Log.d("INFO_PERIODO", "ID RECIBIDO: $idLecturaDetalle")
         binding.txtPeriodo.setText(periodo_concepto)
@@ -66,6 +56,8 @@ class AvisoCobroDetalle: AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+        iniVar()
+        cargarDatosLectura()
         binding.btnAtras.setOnClickListener {
             actAvisoCobro()
         }
@@ -88,6 +80,7 @@ class AvisoCobroDetalle: AppCompatActivity() {
 
     }
 
+    //FUNCION PARA INICIALIZAR VARIABLES
     private fun iniVar() {
         lecturaVM = ViewModelProvider(this)[lecturaViewModel::class.java]
         periodo_prefs = PeriodoPreferences(this@AvisoCobroDetalle)
@@ -97,14 +90,17 @@ class AvisoCobroDetalle: AppCompatActivity() {
         vendedor = preferencias.getString("nombreEmpleado", "").toString()
         alert = AlertDialogo(this@AvisoCobroDetalle, this)
         impresionController = ImpresionController(this@AvisoCobroDetalle)
+        idLecturaDetalle = intent.getIntExtra("Id_lectura_detalle", 0)
     }
 
+    //FUNCION QUE ENVÍA A LA ACTIVIDAD MenuAvisosCobros
     private fun actAvisoCobro() {
         val intent = Intent(this@AvisoCobroDetalle, MenuAvisosCobros::class.java)
         startActivity(intent)
         finish()
     }
 
+    //FUNCION PARA CARGA DE DATOS
     private fun cargarDatosLectura() {
         lecturaVM.obtenerLecturaId(idLecturaDetalle) { lectura ->
             if (lectura != null) {
@@ -139,6 +135,7 @@ class AvisoCobroDetalle: AppCompatActivity() {
         }
     }
 
+    //FUNCION PARA PROCESAR LA LECTURA
     private fun procesarLecturaPendiente(lectura: LecturaEntity) {
         alert!!.Cargando()
         val baseUrl = funciones.obtenerServidor(this)
@@ -194,6 +191,7 @@ class AvisoCobroDetalle: AppCompatActivity() {
                             sector = consumoResponse.sector,
                             idzona = consumoResponse.idZona,
                             zona = consumoResponse.zona,
+                            //CARGOS FIJOS
                             cf1_linea = consumoResponse.cf1_linea,
                             cf1_descripcion = consumoResponse.cf1_descripcion,
                             cf1_precio = consumoResponse.cf1_precio,
@@ -208,7 +206,41 @@ class AvisoCobroDetalle: AppCompatActivity() {
                             cf4_precio = consumoResponse.cf4_precio,
                             cf5_linea = consumoResponse.cf5_linea,
                             cf5_descripcion = consumoResponse.cf5_descripcion,
-                            cf5_precio = consumoResponse.cf5_precio
+                            cf5_precio = consumoResponse.cf5_precio,
+                            //PLIEGO TARIFARIO
+                            minimo_m3 = consumoResponse.minimo_m3,
+                            primeros_m3 = consumoResponse.primeros_m3,
+                            primeros_m3_valor = consumoResponse.primeros_m3_valor,
+                            e1_minimo_m3 = consumoResponse.e1_minimo_m3,
+                            e1_maximo_m3 = consumoResponse.e1_maximo_m3,
+                            e1_valor_m3 = consumoResponse.e1_valor_m3,
+                            e2_minimo_m3 = consumoResponse.e2_minimo_m3,
+                            e2_maximo_m3 = consumoResponse.e2_maximo_m3,
+                            e2_valor_m3 = consumoResponse.e2_valor_m3,
+                            e3_minimo_m3 = consumoResponse.e3_minimo_m3,
+                            e3_maximo_m3 = consumoResponse.e3_maximo_m3,
+                            e3_valor_m3 = consumoResponse.e3_valor_m3,
+                            e4_minimo_m3 = consumoResponse.e4_minimo_m3,
+                            e4_maximo_m3 = consumoResponse.e4_maximo_m3,
+                            e4_valor_m3 = consumoResponse.e4_valor_m3,
+                            e5_minimo_m3 = consumoResponse.e5_minimo_m3,
+                            e5_maximo_m3 = consumoResponse.e5_maximo_m3,
+                            e5_valor_m3 = consumoResponse.e5_valor_m3,
+                            e6_minimo_m3 = consumoResponse.e6_minimo_m3,
+                            e6_maximo_m3 = consumoResponse.e6_minimo_m3,
+                            e6_valor_m3 = consumoResponse.e6_valor_m3,
+                            e7_minimo_m3 = consumoResponse.e7_minimo_m3,
+                            e7_maximo_m3 = consumoResponse.e7_maximo_m3,
+                            e7_valor_m3 = consumoResponse.e7_valor_m3,
+                            e8_minimo_m3 = consumoResponse.e8_minimo_m3,
+                            e8_maximo_m3 = consumoResponse.e8_maximo_m3,
+                            e8_valor_m3 = consumoResponse.e8_valor_m3,
+                            e9_minimo_m3 = consumoResponse.e9_minimo_m3,
+                            e9_maximo_m3 = consumoResponse.e9_maximo_m3,
+                            e9_valor_m3 = consumoResponse.e9_valor_m3,
+                            e10_minimo_m3 = consumoResponse.e10_minimo_m3,
+                            e10_maximo_m3 = consumoResponse.e10_maximo_m3,
+                            e10_valor_m3 = consumoResponse.e10_valor_m3
                         ) {
                             cargarDatosLectura()
                             impresionController.imprimirRecibo(this@AvisoCobroDetalle,consumoResponse)
@@ -218,10 +250,15 @@ class AvisoCobroDetalle: AppCompatActivity() {
                     val mensaje = response.errorBody()
                         ?.string()?.trim()?.removeSurrounding("\"")
                         ?: "Error al procesar la lectura."
-                    Log.e("API", "HTTP ${response.code()}: $mensaje")
+                    Log.e("API", " [PROCESAR LECTURA]HTTP ${response.code()}: $mensaje")
                     runOnUiThread {
                         alert?.dismisss()
                         Toast.makeText(this@AvisoCobroDetalle, mensaje, Toast.LENGTH_LONG).show()
+                        if (mensaje == "No hay última lectura."){
+                            mensajeLecturaAnterior(
+                                cuenta = lectura.Cuenta
+                            )
+                        }
                     }
                 }
 
@@ -239,6 +276,7 @@ class AvisoCobroDetalle: AppCompatActivity() {
         }
     }
 
+    //FUNCION PARA IMPRIMIR LA LECTURA YA PROCESADA
     private fun imprimirLectura(lectura: LecturaEntity){
         val consmo = ConsumoResponse(
             cuenta = lectura.Cuenta,
@@ -271,7 +309,41 @@ class AvisoCobroDetalle: AppCompatActivity() {
             cf4_precio = lectura.Cf4_precio,
             cf5_linea = lectura.Cf5_linea,
             cf5_descripcion = lectura.Cf5_descripcion,
-            cf5_precio = lectura.Cf5_precio
+            cf5_precio = lectura.Cf5_precio,
+            //PLIEGO TARIFARIO
+            minimo_m3 = lectura.Minimo_m3,
+            primeros_m3 = lectura.Primeros_m3,
+            primeros_m3_valor = lectura.Primeros_m3_valor,
+            e1_minimo_m3 = lectura.E1_minimo_m3,
+            e1_maximo_m3 = lectura.E1_maximo_m3,
+            e1_valor_m3 = lectura.E1_valor_m3,
+            e2_minimo_m3 = lectura.E2_minimo_m3,
+            e2_maximo_m3 = lectura.E2_maximo_m3,
+            e2_valor_m3 = lectura.E2_valor_m3,
+            e3_minimo_m3 = lectura.E3_minimo_m3,
+            e3_maximo_m3 = lectura.E3_maximo_m3,
+            e3_valor_m3 = lectura.E3_valor_m3,
+            e4_minimo_m3 = lectura.E4_minimo_m3,
+            e4_maximo_m3 = lectura.E4_maximo_m3,
+            e4_valor_m3 = lectura.E4_valor_m3,
+            e5_minimo_m3 = lectura.E5_minimo_m3,
+            e5_maximo_m3 = lectura.E5_maximo_m3,
+            e5_valor_m3 = lectura.E5_valor_m3,
+            e6_minimo_m3 = lectura.E6_minimo_m3,
+            e6_maximo_m3 = lectura.E6_maximo_m3,
+            e6_valor_m3 = lectura.E6_valor_m3,
+            e7_minimo_m3 = lectura.E7_minimo_m3,
+            e7_maximo_m3 = lectura.E7_maximo_m3,
+            e7_valor_m3 = lectura.E7_valor_m3,
+            e8_minimo_m3 = lectura.E8_minimo_m3,
+            e8_maximo_m3 = lectura.E8_maximo_m3,
+            e8_valor_m3 = lectura.E8_valor_m3,
+            e9_minimo_m3 = lectura.E9_minimo_m3,
+            e9_maximo_m3 = lectura.E9_maximo_m3,
+            e9_valor_m3 = lectura.E9_valor_m3,
+            e10_minimo_m3 = lectura.E10_minimo_m3,
+            e10_maximo_m3 = lectura.E10_maximo_m3,
+            e10_valor_m3 = lectura.E10_valor_m3
         )
         impresionController.imprimirRecibo(this@AvisoCobroDetalle,consmo){
             binding.btnImprimirAviso.postDelayed({
@@ -280,6 +352,36 @@ class AvisoCobroDetalle: AppCompatActivity() {
             },2000)
         }
 
+    }
+
+    //FUNCION QUE MUESTRA EL MENSAJE EN CASO NO EXISTA LECTURA ANTERIOR
+    private fun mensajeLecturaAnterior(cuenta: String){
+        val lAnteriorDialog = Dialog(this,R.style.Theme_Dialog)
+        lAnteriorDialog.setCancelable(false)
+        lAnteriorDialog.setContentView(R.layout.dialog_lectura_anterior)
+
+        val procesarAnterior = lAnteriorDialog.findViewById<TextView>(R.id.procesarAnterior)
+        val cancelLectura = lAnteriorDialog.findViewById<TextView>(R.id.cancelLectura)
+
+        procesarAnterior.setOnClickListener {
+            actLecturaAnterior(cuenta)
+            lAnteriorDialog.dismiss()
+        }
+        cancelLectura.setOnClickListener {
+            lAnteriorDialog.dismiss()
+        }
+        lAnteriorDialog.show()
+    }
+
+    //FUNCION QUE ENVÍA A LA ACTIVIDAD AvisoLecturaAnterior
+    private fun actLecturaAnterior(cuenta: String){
+        Log.d("AVISO","CERRANDO ACTIVIDAD")
+        val intent = Intent(this@AvisoCobroDetalle, AvisoLecturaAnterior::class.java)
+        intent.putExtra("cuenta",cuenta)
+        intent.putExtra("actividad","DETALLE_AVISO")
+        intent.putExtra("Id_lectura_detalle", idLecturaDetalle)
+        startActivity(intent)
+        finish()
     }
 
 }

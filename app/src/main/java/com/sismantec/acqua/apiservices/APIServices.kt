@@ -3,6 +3,7 @@ package com.sismantec.acqua.apiservices
 import com.sismantec.acqua.models.Cliente
 import com.sismantec.acqua.models.ConfigModel
 import com.sismantec.acqua.models.ConsumoResponse
+import com.sismantec.acqua.models.LecturaAnteriorRequest
 import com.sismantec.acqua.models.LecturaRequest
 import com.sismantec.acqua.models.LoginModel
 import com.sismantec.acqua.models.LogoutModel
@@ -17,6 +18,7 @@ import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
 import com.sismantec.acqua.models.PeriodoModel
+import com.sismantec.acqua.models.RespuestaLecturaAnterior
 
 interface APIServices {
 
@@ -57,5 +59,11 @@ interface APIServices {
     suspend fun obtenerPeriodo(
         @Path("id") idPeriodo: Int
     ): Response<PeriodoModel>
+
+    @Headers("Content-Type: application/json")
+    @POST("procesar_lectura_anterior")
+    suspend fun procesarLecturaAnterior(
+        @Body request: LecturaAnteriorRequest
+    ): Response<RespuestaLecturaAnterior>
 
 }

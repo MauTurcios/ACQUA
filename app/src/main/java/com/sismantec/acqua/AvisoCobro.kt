@@ -64,11 +64,6 @@ class AvisoCobro : AppCompatActivity() {
         lecturaVM = ViewModelProvider(this)[lecturaViewModel::class.java]
         preferencias = getSharedPreferences(instancia, MODE_PRIVATE)
         vendedor = preferencias.getString("nombreEmpleado", "").toString()
-        /*
-        clienteVM = ViewModelProvider(this)[clienteViewModel::class.java]
-        idCliente = intent.getIntExtra("idCliente", 0)
-        Log.d("DATOS", "ID recibido: $idCliente")
-         */
         impressionController = ImpresionController(this@AvisoCobro)
         periodo_prefs = PeriodoPreferences(this@AvisoCobro)
         onBackPressedDispatcher.addCallback(this){}
@@ -116,15 +111,7 @@ class AvisoCobro : AppCompatActivity() {
                 //SI LA CUENTA NO TIENE UNA LECTURA PENDIENTE REGISTRADA
                 procesarLectura(cuenta,lecturaTxt,idPeriodo,vendedor){
                         consumo ->
-                    Log.d("AVISO", "Cuenta: ${consumo.cuenta}")
-                    Log.d("AVISO", "Periodo: ${consumo.periodo}")
-                    Log.d("AVISO", "Lectura anterior: ${consumo.lecturaAnterior}")
-                    Log.d("AVISO", "Lectura actual: ${consumo.lecturaActual}")
-                    Log.d("AVISO", "Consumo: ${consumo.consumo}")
-
                     lecturaVM.guardarLectura(consumo)
-
-                    Log.d("AVISO","ENVIANDO A MenuAvisoCobro")
                     actAvisoCobro()
                 }
             }
@@ -132,6 +119,7 @@ class AvisoCobro : AppCompatActivity() {
         }
     }
 
+    //FUNCION PARA PROCESAR LECTURA
     private fun procesarLectura(cuenta: String, lectura: Double, idLectura: Int, empleado: String, onResult: (ConsumoResponse) -> Unit) {
         alert!!.Cargando()
         val baseUrl = funciones.obtenerServidor(this)
@@ -167,7 +155,7 @@ class AvisoCobro : AppCompatActivity() {
                         //IMPRIMIR TICKET
                         val consumo = response.body()
                         if (consumo != null){
-                            impressionController.imprimirRecibo(this@AvisoCobro,consumo!!)
+                            impressionController.imprimirRecibo(this@AvisoCobro,consumo)
                         }
                     } else {
                         val mensaje = response.errorBody()
@@ -177,6 +165,11 @@ class AvisoCobro : AppCompatActivity() {
                         runOnUiThread {
                             alert?.dismisss()
                             Toast.makeText(this@AvisoCobro, mensaje, Toast.LENGTH_LONG).show()
+                            if (mensaje == "No hay última lectura."){
+                                mensajeLecturaAnterior(
+                                    cuenta = cuenta
+                                )
+                            }
                         }
                     }
                 } catch (e: Exception) {
@@ -219,7 +212,7 @@ class AvisoCobro : AppCompatActivity() {
     }
      */
 
-
+    //FUNCION QUE MUESTRA MENSAJE PARA GUARDAR LECTURA
     private fun mensajeLecturaPendiente(cuenta: String, lectura: Double, periodo: Int, usuario: String){
         val lecturaDialog = Dialog(this, R.style.Theme_Dialog)
         lecturaDialog.setCancelable(false)
@@ -248,6 +241,7 @@ class AvisoCobro : AppCompatActivity() {
                     IdZona = 0,
                     Zona = "",
                     Lectura_enviada = false,
+                    //CARGOS FIJOS
                     Cf1_linea = "",
                     Cf1_descripcion = "",
                     Cf1_precio = 0.00,
@@ -262,7 +256,42 @@ class AvisoCobro : AppCompatActivity() {
                     Cf4_precio = 0.00,
                     Cf5_linea = "",
                     Cf5_descripcion = "",
-                    Cf5_precio = 0.00
+                    Cf5_precio = 0.00,
+
+                    //PLIEGO TARIFARIO
+                    Minimo_m3 = 0,
+                    Primeros_m3 = 0.00,
+                    Primeros_m3_valor = 0.00,
+                    E1_minimo_m3 = 0.00,
+                    E1_maximo_m3 = 0.00,
+                    E1_valor_m3 = 0.00,
+                    E2_minimo_m3 = 0.00,
+                    E2_maximo_m3 = 0.00,
+                    E2_valor_m3 = 0.00,
+                    E3_minimo_m3 = 0.00,
+                    E3_maximo_m3 = 0.00,
+                    E3_valor_m3 = 0.00,
+                    E4_minimo_m3 = 0.00,
+                    E4_maximo_m3 = 0.00,
+                    E4_valor_m3 = 0.00,
+                    E5_minimo_m3 = 0.00,
+                    E5_maximo_m3 = 0.00,
+                    E5_valor_m3 = 0.00,
+                    E6_minimo_m3 = 0.00,
+                    E6_maximo_m3 = 0.00,
+                    E6_valor_m3 = 0.00,
+                    E7_minimo_m3 = 0.00,
+                    E7_maximo_m3 = 0.00,
+                    E7_valor_m3 = 0.00,
+                    E8_minimo_m3 = 0.00,
+                    E8_maximo_m3 = 0.00,
+                    E8_valor_m3 = 0.00,
+                    E9_minimo_m3 = 0.00,
+                    E9_maximo_m3 = 0.00,
+                    E9_valor_m3 = 0.00,
+                    E10_minimo_m3 = 0.00,
+                    E10_maximo_m3 = 0.00,
+                    E10_valor_m3 = 0.00
                 )
                 AppDataBase.obtenerInstancia(this@AvisoCobro).LecturaDAO().insertar(lecturaPendiente)
                 withContext(Dispatchers.Main){
@@ -282,9 +311,39 @@ class AvisoCobro : AppCompatActivity() {
         lecturaDialog.show()
     }
 
+    //FUNCION QUE MUESTRA EL MENSAJE EN CASO NO EXISTA LECTURA ANTERIOR
+    private fun mensajeLecturaAnterior(cuenta: String){
+        val lAnteriorDialog = Dialog(this,R.style.Theme_Dialog)
+        lAnteriorDialog.setCancelable(false)
+        lAnteriorDialog.setContentView(R.layout.dialog_lectura_anterior)
+
+        val procesarAnterior = lAnteriorDialog.findViewById<TextView>(R.id.procesarAnterior)
+        val cancelLectura = lAnteriorDialog.findViewById<TextView>(R.id.cancelLectura)
+
+        procesarAnterior.setOnClickListener {
+            actLecturaAnterior(cuenta)
+            lAnteriorDialog.dismiss()
+        }
+        cancelLectura.setOnClickListener {
+            lAnteriorDialog.dismiss()
+        }
+        lAnteriorDialog.show()
+    }
+
+    //FUNCION QUE ENVÍA A ACTIVIDAD MenuAvisosCobros
     private fun actAvisoCobro(){
         Log.d("AVISO","CERRANDO ACTIVIDAD")
         val intent = Intent(this@AvisoCobro, MenuAvisosCobros::class.java)
+        startActivity(intent)
+        finish()
+    }
+
+    //FUNCION QUE ENVÍA A ACTIVIDAD AvisoLecturaAnterior
+    private fun actLecturaAnterior(cuenta: String){
+        Log.d("AVISO","CERRANDO ACTIVIDAD")
+        val intent = Intent(this@AvisoCobro, AvisoLecturaAnterior::class.java)
+        intent.putExtra("cuenta",cuenta)
+        intent.putExtra("actividad","AVISO_COBRO")
         startActivity(intent)
         finish()
     }

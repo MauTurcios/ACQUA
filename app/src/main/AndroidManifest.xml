@@ -75,6 +75,9 @@
         android:exported="false"
         android:screenOrientation="portrait"
         /><activity
+        android:name="AvisoLecturaAnterior"
+        android:exported="false"
+        /><activity
             android:name=".SplashScreen"
             android:exported="true"
             android:screenOrientation="portrait">

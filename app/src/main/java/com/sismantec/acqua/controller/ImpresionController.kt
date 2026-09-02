@@ -34,10 +34,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import java.util.Locale
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.content.ContextCompat
+import java.util.Locale
 
 
 class ImpresionController(private val context: Context) {
@@ -146,14 +146,14 @@ class ImpresionController(private val context: Context) {
             else -> null
         } ?: return
 
-        val direccionFormateada = dividirEnLineas(direccion, 32)
-        val empresaFormateada = dividirEnLineas(empresa, 32)
-        val giroFormateada = dividirEnLineas(giro, 32)
-        val textoPieFormateado = dividirEnLineas(textoPie, 32)
-        val nrcFormateado = dividirEnLineas(nrc,32)
-        val nitFormateado = dividirEnLineas(nit, 32)
-        val giroCliente = dividirEnLineas("", 32)
-        val direccionCliente = dividirEnLineas(datos.direccion, 32)
+        val direccionFormateada = dividirEnLineas(direccion, 31)
+        val empresaFormateada = dividirEnLineas(empresa, 31)
+        val giroFormateada = dividirEnLineas(giro, 31)
+        val textoPieFormateado = dividirEnLineas(textoPie, 31)
+        val nrcFormateado = dividirEnLineas(nrc,31)
+        val nitFormateado = dividirEnLineas(nit, 31)
+        val giroCliente = dividirEnLineas("", 31)
+        val direccionCliente = dividirEnLineas(datos.direccion, 31)
         // ===============================
         // Preparar logo y texto
         // ===============================
@@ -189,30 +189,30 @@ class ImpresionController(private val context: Context) {
             .append("[C]$nrcFormateado\n")
             .append("[C]$nitFormateado\n")
             .append("[C]$giroFormateada\n")
-            .append("[L]--------------------------------\n")
+            .append("[L]-------------------------------\n")
             .append("[C]PERIODO DEL: $fecha_incio \n")
             .append("[C]AL: $fecha_fin \n")
-            .append("[L]--------------------------------\n")
+            .append("[L]-------------------------------\n")
             .append("[C]CARGO FIJO\n")
-            .append(String.format("[L]%-23s%9s\n", "DESCRIPCION", "VALOR"))
-            .append("[L]--------------------------------\n")
-            .append(construirCargosFijos(datos))
-            .append("[L]--------------------------------\n\n")
+            .append(String.format("[L]%-23s%8s\n", "DESCRIPCION", "VALOR"))
+            .append("[L]-------------------------------\n")
+            .append(construirCargoFijo(datos))
+            .append("[L]-------------------------------\n\n")
             .append("[C]CARGO POR CONSUMO\n")
             .append(String.format("[L]%-12s%9s%9s\n", "DESCRIPCION", "VALOR", "ALCANT."))
-            .append("[L]--------------------------------\n")
-            .append(filaTablaTarifario("0  A 15M3", "$ 0.24", "$ 2.00"))
-            .append(filaTablaTarifario("16 A 25M3", "$ 0.36", "$ 2.00"))
-            .append(filaTablaTarifario("26 A 35M3", "$ 0.48", "$ 2.00"))
-            .append(filaTablaTarifario("36 A 45M3", "$ 0.66", "$ 2.00"))
-            .append(filaTablaTarifario("45 A 60M3", "$ 0.78", "$ 3.50"))
-            .append(filaTablaTarifario("61 A 70M3", "$ 0.84", "$ 3.50"))
-            .append(filaTablaTarifario("71 A 80M3", "$ 0.96", "$ 3.50"))
-            .append(filaTablaTarifario("81 A 90M3", "$ 1.20", "$ 3.50"))
-            .append(filaTablaTarifario("91 A MAS", " $ 1.44", "$ 3.50"))
-            .append("[L]--------------------------------\n")
+            .append("[L]-------------------------------\n")
+            .append(filaTablaTarifario("0  A ${datos.primeros_m3.toInt()}M3", "$${datos.primeros_m3_valor}", "$ 2.00"))
+            .append(filaTablaTarifario("${datos.e1_minimo_m3.toInt()} A ${datos.e1_maximo_m3.toInt()}M3", "$${datos.e1_valor_m3}", "$ 2.00"))
+            .append(filaTablaTarifario("${datos.e2_minimo_m3.toInt()} A ${datos.e2_maximo_m3.toInt()}M3", "$${datos.e2_valor_m3}", "$ 2.00"))
+            .append(filaTablaTarifario("${datos.e3_minimo_m3.toInt()} A ${datos.e3_maximo_m3.toInt()}M3", "$${datos.e3_valor_m3}", "$ 2.00"))
+            .append(filaTablaTarifario("${datos.e4_minimo_m3.toInt()} A ${datos.e4_maximo_m3.toInt()}M3", "$${datos.e4_valor_m3}", "$ 3.50"))
+            .append(filaTablaTarifario("${datos.e5_minimo_m3.toInt()} A ${datos.e5_maximo_m3.toInt()}M3", "$${datos.e5_valor_m3}", "$ 3.50"))
+            .append(filaTablaTarifario("${datos.e6_minimo_m3.toInt()} A ${datos.e6_maximo_m3.toInt()}M3", "$${datos.e6_valor_m3}", "$ 3.50"))
+            .append(filaTablaTarifario("${datos.e7_minimo_m3.toInt()} A ${datos.e7_maximo_m3.toInt()}M3", "$${datos.e7_valor_m3}", "$ 3.50"))
+            .append(filaTablaTarifario("${datos.e8_minimo_m3.toInt()} A MAS", " ${datos.e8_valor_m3}", "$ 3.50"))
+            .append("[L]-------------------------------\n")
             .append("[C]DATOS DEL CLIENTE\n")
-            .append("[L]--------------------------------\n")
+            .append("[L]-------------------------------\n")
             .append("[C]FECHA: ${fhformato} \n")
             .append("[L]NUM DE CUENTA: <u><font size='big'>${datos.cuenta}</font></u>\n")
             .append("[L]NOMBRE:\n")
@@ -220,29 +220,27 @@ class ImpresionController(private val context: Context) {
             .append("[L]DOCUMENTO: ${datos.documento} \n")
             .append("[L]DIRECCION: \n")
             .append("[L]$direccionCliente\n")
-            .append("[L]--------------------------------\n")
+            .append("[L]-------------------------------\n")
             .append("[C]DETALLE DEL DOCUMENTO\n")
-            .append("[L]--------------------------------\n")
+            .append("[L]-------------------------------\n")
             .append(String.format("[L]%-9s%9s\n", "L.ACT.", "L.ANTE."))
             .append(filaTablaLecturas1("${datos.lecturaActual}M3", "${datos.lecturaAnterior}M3"))
-            .append("[L]--------------------------------\n")
-
+            .append("[L]-------------------------------\n")
             .append(String.format("[L]%-9s%9s\n", "CONS. M3.", "VALOR"))
             .append(filaTablaLecturas2("${datos.consumo}M3", "   $ ${String.format("%.2f", 0.72)}"))
-            .append("[L]--------------------------------\n")
-
+            .append("[L]-------------------------------\n")
             .append(String.format("[L]%-12s%3s%6s%6S\n", "", "", "  PRECIO", ""))
             .append(String.format("[L]%-12s%3s%6s%6S\n", "  DESCRIP", "CANT", "UNI.", "  TOTAL"))
-            .append("[L]--------------------------------\n")
+            .append("[L]-------------------------------\n")
             .append(filaTablaTotales("COST. ADMIN", "1", "$ ${String.format("%.2f", 3.58)}", "$ ${String.format("%.2f", 3.58)}"))
             .append(filaTablaTotales("MANTTO. SIST. AGUA POTABLE", "1", "$ ${String.format("%.2f", 4.42)}", "$ ${String.format("%.2f", 4.42)}"))
             .append(filaTablaTotales("CONSU. AGUA M3", "3", "$ ${String.format("%.2f", 0.24)}", "$ ${String.format("%.2f", 0.72)}"))
             .append(filaTablaTotales("CANON POR M3", "3", "$ ${String.format("%.2f", 0.07)}", "$ ${String.format("%.2f", 0.21)}"))
             .append(filaTablaTotales("MANTTO ALCANT. SANITARIO", "1", "$ ${String.format("%.2f", 2.00)}", "$ ${String.format("%.2f", 2.00)}"))
             .append(filaTablaTotales("PAGO DE NOVIEMBRE", "1", "\$ ${String.format("%.2f", 0.00)}", "$ ${String.format("%.2f", 0.00)}"))
-            .append("[L]--------------------------------\n")
+            .append("[L]-------------------------------\n")
             .append(filaTablaTotales("TOTAL", "", "", "$ ${String.format("%.2f", 10.93)}"))
-            .append("[L]--------------------------------\n\n")
+            .append("[L]-------------------------------\n\n")
             .append("[L]ENTREGADO POR: ${vendedor}\n")
             .append("[C]<b>$textoPieFormateado</b>\n")
             .append(" \n")
@@ -380,20 +378,20 @@ class ImpresionController(private val context: Context) {
                 .append("[C]CARGO FIJO\n")
                 .append(String.format("[L]%-23s%8s\n", "DESCRIPCION", "VALOR"))
                 .append("[L]-------------------------------\n")
-                .append(construirCargosFijos(datos))
+                .append(construirCargoFijo(datos))
                 .append("[L]-------------------------------\n\n")
                 .append("[C]CARGO POR CONSUMO\n")
                 .append(String.format("[L]%-12s%9s%9s\n", "DESCRIPCION", "VALOR", "ALCANT."))
                 .append("[L]-------------------------------\n")
-                .append(filaTablaTarifario("0  A 15M3", "$ 0.24", "$ 2.00"))
-                .append(filaTablaTarifario("16 A 25M3", "$ 0.36", "$ 2.00"))
-                .append(filaTablaTarifario("26 A 35M3", "$ 0.48", "$ 2.00"))
-                .append(filaTablaTarifario("36 A 45M3", "$ 0.66", "$ 2.00"))
-                .append(filaTablaTarifario("45 A 60M3", "$ 0.78", "$ 3.50"))
-                .append(filaTablaTarifario("61 A 70M3", "$ 0.84", "$ 3.50"))
-                .append(filaTablaTarifario("71 A 80M3", "$ 0.96", "$ 3.50"))
-                .append(filaTablaTarifario("81 A 90M3", "$ 1.20", "$ 3.50"))
-                .append(filaTablaTarifario("91 A MAS", " $ 1.44", "$ 3.50"))
+                .append(filaTablaTarifario("0  A ${datos.primeros_m3.toInt()} M3", "$${datos.primeros_m3_valor}", "$ 2.00"))
+                .append(filaTablaTarifario("${datos.e1_minimo_m3.toInt()} A ${datos.e1_maximo_m3.toInt()}M3", "$ ${datos.e1_valor_m3}", "$ 2.00"))
+                .append(filaTablaTarifario("${datos.e2_minimo_m3.toInt()} A ${datos.e2_maximo_m3.toInt()}M3", "$ ${datos.e2_valor_m3}", "$ 2.00"))
+                .append(filaTablaTarifario("${datos.e3_minimo_m3.toInt()} A ${datos.e3_maximo_m3.toInt()}M3", "$ ${datos.e3_valor_m3}", "$ 2.00"))
+                .append(filaTablaTarifario("${datos.e4_minimo_m3.toInt()} A ${datos.e4_maximo_m3.toInt()}M3", "$ ${datos.e4_valor_m3}", "$ 3.50"))
+                .append(filaTablaTarifario("${datos.e5_minimo_m3.toInt()} A ${datos.e5_maximo_m3.toInt()}M3", "$ ${datos.e5_valor_m3}", "$ 3.50"))
+                .append(filaTablaTarifario("${datos.e6_minimo_m3.toInt()} A ${datos.e6_maximo_m3.toInt()}M3", "$ ${datos.e6_valor_m3}", "$ 3.50"))
+                .append(filaTablaTarifario("${datos.e7_minimo_m3.toInt()} A ${datos.e7_maximo_m3.toInt()}M3", "$ ${datos.e7_valor_m3}", "$ 3.50"))
+                .append(filaTablaTarifario("${datos.e8_minimo_m3.toInt()} A MAS", "$ ${datos.e8_valor_m3}", "$ 3.50"))
                 .append("[L]-------------------------------\n")
                 .append("[C]DATOS DEL CLIENTE\n")
                 .append("[L]-------------------------------\n")
@@ -407,14 +405,12 @@ class ImpresionController(private val context: Context) {
                 .append("[L]-------------------------------\n")
                 .append("[C]DETALLE DEL DOCUMENTO\n")
                 .append("[L]-------------------------------\n")
-                .append(String.format("[L]%-7s%12s\n", "L.ACT.", "L.ANTE."))
+                .append(String.format("[L]%-12s%12s\n", "L.ACT.", "L.ANTE."))
                 .append(filaTablaLecturas1("${datos.lecturaActual}M3", "${datos.lecturaAnterior}M3"))
                 .append("[L]-------------------------------\n")
-
-                .append(String.format("[L]%-7s%12s\n", "CONS. M3.", "VALOR"))
+                .append(String.format("[L]%-12s%12s\n", "CONS. M3.", "VALOR"))
                 .append(filaTablaLecturas2("${datos.consumo}M3", "   $ ${String.format("%.2f", 0.72)}"))
                 .append("[L]-------------------------------\n")
-
                 .append(String.format("[L]%-12s%3s%6s%6S\n", "", "", "  PRECIO", ""))
                 .append(String.format("[L]%-12s%3s%6s%6S\n", "  DESCRIP", "CANT", "UNI.", "  TOTAL"))
                 .append("[L]-------------------------------\n")
@@ -451,51 +447,6 @@ class ImpresionController(private val context: Context) {
         )
     }
 
-    private data class CargoFijo(
-        val linea: String,
-        val descripcion: String,
-        val precio: Double
-    )
-
-    private fun construirCargosFijos(datos: ConsumoResponse): String {
-        val cargos = listOf(
-            CargoFijo(datos.cf1_linea, datos.cf1_descripcion, datos.cf1_precio),
-            CargoFijo(datos.cf2_linea, datos.cf2_descripcion, datos.cf2_precio),
-            CargoFijo(datos.cf3_linea, datos.cf3_descripcion, datos.cf3_precio),
-            CargoFijo(datos.cf4_linea, datos.cf4_descripcion, datos.cf4_precio),
-            CargoFijo(datos.cf5_linea, datos.cf5_descripcion, datos.cf5_precio)
-        ).filter { it.descripcion.isNotBlank() }
-
-        return buildString {
-            cargos.forEach { cargo ->
-                if (cargo.linea.isNotBlank()) {
-                    val linea = cargo.linea.trim().let {
-                        if (it.endsWith(":")) it else "$it:"
-                    }
-                    append(filaTablafIJO(linea, ""))
-                }
-
-                append(
-                    filaTablafIJO(
-                        " - ${cargo.descripcion.trim()}",
-                        formatearMoneda(cargo.precio)
-                    )
-                )
-            }
-
-            append(
-                filaTablafIJO(
-                    "TOTAL",
-                    formatearMoneda(cargos.sumOf { it.precio })
-                )
-            )
-        }
-    }
-
-    private fun formatearMoneda(valor: Double): String {
-        return String.format(Locale.US, "\$%.2f", valor)
-    }
-
     //Funcion para simular una tabla
     private fun filaTablafIJO(desc: String, valor: String): String {
         return String.format(
@@ -519,15 +470,15 @@ class ImpresionController(private val context: Context) {
     private fun filaTablaLecturas1(lActual: String, lAnterior: String): String {
         return String.format(
             "[L]%-7s%12s\n",
-            lActual.take(7),
-            lAnterior.take(7)
+            lActual.take(12),
+            lAnterior.take(12)
         )
     }
     private fun filaTablaLecturas2(consumo: String, total:String): String {
         return String.format(
             "[L]%-7s%12s\n",
-            consumo.take(7),
-            total.take(9)
+            consumo.take(12),
+            total.take(12)
         )
     }
 
@@ -568,6 +519,49 @@ class ImpresionController(private val context: Context) {
             context,
             Manifest.permission.BLUETOOTH_CONNECT
         )== PackageManager.PERMISSION_GRANTED
+    }
+
+    private data class CargoFijo(
+        val linea: String,
+        val descripcion: String,
+        val precio: Double
+    )
+
+    private fun construirCargoFijo(datos: ConsumoResponse): String{
+        val cargos = listOf(
+            CargoFijo(datos.cf1_linea, datos.cf1_descripcion,datos.cf1_precio),
+            CargoFijo(datos.cf2_linea, datos.cf2_descripcion,datos.cf2_precio),
+            CargoFijo(datos.cf3_linea, datos.cf3_descripcion,datos.cf3_precio),
+            CargoFijo(datos.cf4_linea, datos.cf4_descripcion,datos.cf4_precio),
+            CargoFijo(datos.cf5_linea, datos.cf5_descripcion,datos.cf5_precio)
+        ).filter { it.descripcion.isNotBlank() }
+        return buildString {
+            cargos.forEach {
+                cargo ->
+                if (cargo.linea.isNotBlank()){
+                    val linea = cargo.linea.trim().let {
+                        if (it.endsWith(":")) it else "$it:"
+                    }
+                    append(filaTablafIJO(linea,""))
+                }
+                append(
+                    filaTablafIJO(
+                        "- ${cargo.descripcion.trim()}",
+                        formatearMoneda(cargo.precio)
+                    )
+                )
+            }
+            append(
+                filaTablafIJO(
+                    "TOTAL",
+                    formatearMoneda(cargos.sumOf { it.precio })
+                )
+            )
+        }
+    }
+
+    private fun formatearMoneda(valor: Double): String {
+        return String.format(Locale.US, "\$%.2f", valor)
     }
 
 }

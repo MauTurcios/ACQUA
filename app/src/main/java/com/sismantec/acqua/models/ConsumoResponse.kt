@@ -4,6 +4,7 @@ import java.sql.Date
 
 
 data class ConsumoResponse(
+    //DATOS GENERALES DE LA LECTURA
     val cuenta: String,
     val nombre: String,
     val periodo: Int,
@@ -20,6 +21,7 @@ data class ConsumoResponse(
     val sector: String,
     val idZona: Int,
     val zona: String,
+    //CARGOS FIJOS
     val cf1_linea: String,
     val cf1_descripcion: String,
     val cf1_precio: Double,
@@ -34,5 +36,39 @@ data class ConsumoResponse(
     val cf4_precio: Double,
     val cf5_linea: String,
     val cf5_descripcion: String,
-    val cf5_precio: Double
+    val cf5_precio: Double,
+    //PLIEGO TARIFARIO
+    val minimo_m3: Int,
+    val primeros_m3: Double,
+    val primeros_m3_valor: Double,
+    val e1_minimo_m3: Double,
+    val e1_maximo_m3: Double,
+    val e1_valor_m3: Double,
+    val e2_minimo_m3: Double,
+    val e2_maximo_m3: Double,
+    val e2_valor_m3: Double,
+    val e3_minimo_m3: Double,
+    val e3_maximo_m3: Double,
+    val e3_valor_m3: Double,
+    val e4_minimo_m3: Double,
+    val e4_maximo_m3: Double,
+    val e4_valor_m3: Double,
+    val e5_minimo_m3: Double,
+    val e5_maximo_m3: Double,
+    val e5_valor_m3: Double,
+    val e6_minimo_m3: Double,
+    val e6_maximo_m3: Double,
+    val e6_valor_m3: Double,
+    val e7_minimo_m3: Double,
+    val e7_maximo_m3: Double,
+    val e7_valor_m3: Double,
+    val e8_minimo_m3: Double,
+    val e8_maximo_m3: Double,
+    val e8_valor_m3: Double,
+    val e9_minimo_m3: Double,
+    val e9_maximo_m3: Double,
+    val e9_valor_m3: Double,
+    val e10_minimo_m3: Double,
+    val e10_maximo_m3: Double,
+    val e10_valor_m3: Double
 )

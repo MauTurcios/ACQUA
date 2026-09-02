@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey
 @Entity ("lectura")
 data class LecturaEntity(
     @PrimaryKey(autoGenerate = true)
+    //DATOS GENERALES DE LA LECTURA
     val id: Int = 0,
     val Cuenta: String,
     val Nombre: String,
@@ -23,6 +24,7 @@ data class LecturaEntity(
     val IdZona: Int,
     val Zona: String,
     val Lectura_enviada: Boolean = false,
+    //CARGOS FIJOS
     val Cf1_linea: String,
     val Cf1_descripcion: String,
     val Cf1_precio: Double,
@@ -37,5 +39,39 @@ data class LecturaEntity(
     val Cf4_precio: Double,
     val Cf5_linea: String,
     val Cf5_descripcion: String,
-    val Cf5_precio: Double
+    val Cf5_precio: Double,
+    //PLIEGO TARIFARIO
+    val Minimo_m3: Int,
+    val Primeros_m3: Double,
+    val Primeros_m3_valor: Double,
+    val E1_minimo_m3: Double,
+    val E1_maximo_m3: Double,
+    val E1_valor_m3: Double,
+    val E2_minimo_m3: Double,
+    val E2_maximo_m3: Double,
+    val E2_valor_m3: Double,
+    val E3_minimo_m3: Double,
+    val E3_maximo_m3: Double,
+    val E3_valor_m3: Double,
+    val E4_minimo_m3: Double,
+    val E4_maximo_m3: Double,
+    val E4_valor_m3: Double,
+    val E5_minimo_m3: Double,
+    val E5_maximo_m3: Double,
+    val E5_valor_m3: Double,
+    val E6_minimo_m3: Double,
+    val E6_maximo_m3: Double,
+    val E6_valor_m3: Double,
+    val E7_minimo_m3: Double,
+    val E7_maximo_m3: Double,
+    val E7_valor_m3: Double,
+    val E8_minimo_m3: Double,
+    val E8_maximo_m3: Double,
+    val E8_valor_m3: Double,
+    val E9_minimo_m3: Double,
+    val E9_maximo_m3: Double,
+    val E9_valor_m3: Double,
+    val E10_minimo_m3: Double,
+    val E10_maximo_m3: Double,
+    val E10_valor_m3: Double
 )
