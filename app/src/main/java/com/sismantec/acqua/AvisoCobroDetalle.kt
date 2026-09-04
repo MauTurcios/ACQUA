@@ -262,7 +262,7 @@ class AvisoCobroDetalle: AppCompatActivity() {
                     runOnUiThread {
                         alert?.dismisss()
                         Toast.makeText(this@AvisoCobroDetalle, mensaje, Toast.LENGTH_LONG).show()
-                        if (mensaje == "No hay última lectura."){
+                        if (mensaje == "ULTIMA_LECTURA_REQUERIDA"){
                             mensajeLecturaAnterior(
                                 cuenta = lectura.Cuenta
                             )

@@ -170,7 +170,7 @@ class AvisoCobro : AppCompatActivity() {
                         runOnUiThread {
                             alert?.dismisss()
                             Toast.makeText(this@AvisoCobro, mensaje, Toast.LENGTH_LONG).show()
-                            if (mensaje == "No hay última lectura."){
+                            if (mensaje == "ULTIMA_LECTURA_REQUERIDA"){
                                 mensajeLecturaAnterior(
                                     cuenta = cuenta
                                 )
@@ -199,7 +199,7 @@ class AvisoCobro : AppCompatActivity() {
                 Log.e("API", "[PROCESAR LECTURA] Error conexión")
             }
             withContext(Dispatchers.Main){
-                isProcessing = true
+                isProcessing = false
                 binding.btnEnviar.isEnabled = true
             }
         }

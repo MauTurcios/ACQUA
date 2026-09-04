@@ -49,7 +49,6 @@ class ImpresionController(private val context: Context) {
     //val config = Operativo(context)
     private val mutexImpresion = Mutex()
 
-
     //FUNCION PARA DETERMINAR LA CONEXION DE LA IMPRESORA
     fun imprimirRecibo(context: Context, datos: ConsumoResponse, onFinalizado: () -> Unit={}) {
         try {
@@ -123,40 +122,100 @@ class ImpresionController(private val context: Context) {
         }
     }
 
+
     //FUNCION DEL FORMATO DEL TICKET
     private suspend fun imprimirTicket(connection: Any, context: Context, datos: ConsumoResponse) {
-        preferencias = context.getSharedPreferences(instancia, Context.MODE_PRIVATE)
-        periodo_prefs = PeriodoPreferences(context)
-        var vendedor : String = preferencias.getString("nombreEmpleado", "").toString()
-        var direccion : String = preferencias.getString("dteDireccion","").toString()
-        var empresa : String = preferencias.getString("dteNombreComercial","").toString()
-        var giro : String = preferencias.getString("dteGiro","").toString()
-        var nrc : String = preferencias.getString("dteNrc","").toString()
-        var nit : String = preferencias.getString("dteNit","").toString()
-        var fecha_incio = periodo_prefs.getPeriodoInicio()
-        var fecha_fin = periodo_prefs.getPeriodoFin()
-        var fecha_vencimiento = periodo_prefs.getPeriodoVencimiento()
-
-        val textoPie = "ESTE DOCUMENTO NO TIENE VALIDEZ FISCAL"
         val usbManager = context.getSystemService(Context.USB_SERVICE) as UsbManager
 
-        val printer = when(connection) {
+        val printer = when (connection) {
             is UsbDevice -> EscPosPrinter(UsbConnection(usbManager, connection), 160, 48f, 32)
             is BluetoothConnection -> EscPosPrinter(connection, 160, 48f, 28)
             else -> null
         } ?: return
 
+        printer.printFormattedText(
+            construirTicket(
+                printer = printer,
+                context = context,
+                datos = datos
+            )
+        )
+    }
+
+    //FUNCION PARA IMPRIMIR EL RECIBO INTREGRADO
+    @SuppressLint("MissingPermission")
+    private fun imprimirReciboIntegrado(context: Context, datos: ConsumoResponse){
+
+        // Verificación real antes de acceder a Bluetooth
+        if (!tienePermisoBt()){
+            Toast.makeText(context, "Permiso Bluetooth no concedido", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        preferencias = context.getSharedPreferences(instancia, Context.MODE_PRIVATE)
+        val impresorIntegrado = preferencias.getString("impresorIntegrado","sinNombre")?: ""
+
+        if (impresorIntegrado.isBlank()){
+            Toast.makeText(context, "No hay impresora integrada configurada", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+
+        if (bluetoothAdapter == null){
+            Toast.makeText(context, "El dispositivo no dispone de Bluetooth", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val device = bluetoothAdapter.bondedDevices.firstOrNull { device ->
+            Log.d(
+                "IMPRESION_INT",
+                "Vinculado -> Nombre: ${device.name}, MAC: ${device.address}"
+            )
+            device.name?.contains(
+                impresorIntegrado,
+                ignoreCase = true
+            ) == true
+        }
+        if (device != null) {
+            val connection = BluetoothConnection(device)
+            connection.connect()
+
+            val printer = EscPosPrinter(connection, 160, 48f, 28)
+            printer.printFormattedText(
+                construirTicket(
+                    printer = printer,
+                    context = context,
+                    datos = datos
+                )
+            )
+        }else{
+            Toast.makeText(context, "IMPRESOR NO ENCONTRADO", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    //CONSTRUIR FORMATO DEL TICKET
+    private fun construirTicket(printer: EscPosPrinter, context: Context,datos: ConsumoResponse)
+    : String{
+        preferencias = context.getSharedPreferences(instancia, Context.MODE_PRIVATE)
+        periodo_prefs = PeriodoPreferences(context)
+
+        val vendedor = preferencias.getString("nombreEmpleado", "").toString()
+        val direccion = preferencias.getString("dteDireccion", "").toString()
+        val empresa = preferencias.getString("dteNombreComercial", "").toString()
+        val giro = preferencias.getString("dteGiro", "").toString()
+        val nrc = preferencias.getString("dteNrc", "").toString()
+        val nit = preferencias.getString("dteNit", "").toString()
+        val fechaInicio = periodo_prefs.getPeriodoInicio()
+        val fechaFin = periodo_prefs.getPeriodoFin()
+
+        val textoPie = "ESTE DOCUMENTO NO TIENE VALIDEZ FISCAL"
         val direccionFormateada = dividirEnLineas(direccion, 31)
         val empresaFormateada = dividirEnLineas(empresa, 31)
-        val giroFormateada = dividirEnLineas(giro, 31)
+        val giroFormateado = dividirEnLineas(giro, 31)
         val textoPieFormateado = dividirEnLineas(textoPie, 31)
-        val nrcFormateado = dividirEnLineas(nrc,31)
-        val nitFormateado = dividirEnLineas(nit, 31)
-        val giroCliente = dividirEnLineas("", 31)
         val direccionCliente = dividirEnLineas(datos.direccion, 31)
-        // ===============================
-        // Preparar logo y texto
-        // ===============================
+
         val prefs = context.getSharedPreferences("MisImagenes", MODE_PRIVATE)
         val filePath = prefs.getString("imagenFile", null)
 
@@ -173,7 +232,7 @@ class ImpresionController(private val context: Context) {
         }
 
         // Redimensionar
-        val logoRedimensionado = redimensionarLogo(logoOriginal, 384)
+        val logoRedimensionado = redimensionarLogo(logoOriginal, 284)
 
         // ===============================
         // Construir ticket Normal
@@ -183,15 +242,15 @@ class ImpresionController(private val context: Context) {
             .append(PrinterTextParserImg.bitmapToHexadecimalString(printer, logoRedimensionado))
             .append("</img>\n")
             .append("[C]AVISO DE COBRO\n\n")
-            .append("LECTURA MICROMEDIDOR\n")
+            .append("[C]LECTURA MICROMEDIDOR\n")
             .append("[C]$empresaFormateada\n")
             .append("[C]$direccionFormateada\n")
-            .append("[C]$nrcFormateado\n")
-            .append("[C]$nitFormateado\n")
-            .append("[C]$giroFormateada\n")
+            .append("[C]$nrc\n")
+            .append("[C]$nit\n")
+            .append("[C]$giroFormateado\n")
             .append("[L]-------------------------------\n")
-            .append("[C]PERIODO DEL: $fecha_incio \n")
-            .append("[C]AL: $fecha_fin \n")
+            .append("[C]PERIODO DEL: $fechaFin \n")
+            .append("[C]AL: $fechaInicio \n")
             .append("[L]-------------------------------\n")
             .append("[C]CARGO FIJO\n")
             .append(String.format("[L]%-23s%8s\n", "DESCRIPCION", "VALOR"))
@@ -201,15 +260,7 @@ class ImpresionController(private val context: Context) {
             .append("[C]CARGO POR CONSUMO\n")
             .append(String.format("[L]%-12s%9s%9s\n", "DESCRIPCION", "VALOR", "ALCANT."))
             .append("[L]-------------------------------\n")
-            .append(filaTablaTarifario("0  A ${datos.primeros_m3.toInt()}M3", "$${datos.primeros_m3_valor}", "$ 2.00"))
-            .append(filaTablaTarifario("${datos.e1_minimo_m3.toInt()} A ${datos.e1_maximo_m3.toInt()}M3", "$${datos.e1_valor_m3}", "$ 2.00"))
-            .append(filaTablaTarifario("${datos.e2_minimo_m3.toInt()} A ${datos.e2_maximo_m3.toInt()}M3", "$${datos.e2_valor_m3}", "$ 2.00"))
-            .append(filaTablaTarifario("${datos.e3_minimo_m3.toInt()} A ${datos.e3_maximo_m3.toInt()}M3", "$${datos.e3_valor_m3}", "$ 2.00"))
-            .append(filaTablaTarifario("${datos.e4_minimo_m3.toInt()} A ${datos.e4_maximo_m3.toInt()}M3", "$${datos.e4_valor_m3}", "$ 3.50"))
-            .append(filaTablaTarifario("${datos.e5_minimo_m3.toInt()} A ${datos.e5_maximo_m3.toInt()}M3", "$${datos.e5_valor_m3}", "$ 3.50"))
-            .append(filaTablaTarifario("${datos.e6_minimo_m3.toInt()} A ${datos.e6_maximo_m3.toInt()}M3", "$${datos.e6_valor_m3}", "$ 3.50"))
-            .append(filaTablaTarifario("${datos.e7_minimo_m3.toInt()} A ${datos.e7_maximo_m3.toInt()}M3", "$${datos.e7_valor_m3}", "$ 3.50"))
-            .append(filaTablaTarifario("${datos.e8_minimo_m3.toInt()} A MAS", " ${datos.e8_valor_m3}", "$ 3.50"))
+            .append(construirPliegoTarifario(datos))
             .append("[L]-------------------------------\n")
             .append("[C]DATOS DEL CLIENTE\n")
             .append("[L]-------------------------------\n")
@@ -223,10 +274,10 @@ class ImpresionController(private val context: Context) {
             .append("[L]-------------------------------\n")
             .append("[C]DETALLE DEL DOCUMENTO\n")
             .append("[L]-------------------------------\n")
-            .append(String.format("[L]%-9s%9s\n", "L.ACT.", "L.ANTE."))
+            .append(String.format("[L]%-12s%12s\n", "L.ACT.", "L.ANTE."))
             .append(filaTablaLecturas1("${datos.lecturaActual}M3", "${datos.lecturaAnterior}M3"))
             .append("[L]-------------------------------\n")
-            .append(String.format("[L]%-9s%9s\n", "CONS. M3.", "VALOR"))
+            .append(String.format("[L]%-12s%12s\n", "CONS. M3.", "VALOR"))
             .append(filaTablaLecturas2("${datos.consumo}M3", "   $ ${String.format("%.2f", 0.72)}"))
             .append("[L]-------------------------------\n")
             .append(String.format("[L]%-12s%3s%6s%6S\n", "", "", "  PRECIO", ""))
@@ -244,197 +295,60 @@ class ImpresionController(private val context: Context) {
             .append("[L]ENTREGADO POR: ${vendedor}\n")
             .append("[C]<b>$textoPieFormateado</b>\n")
             .append(" \n")
-
-
-        /*
-        *   .append("[L]LECTURA ACTUAL: [R] 35M3 \n")
-            .append("[L]LECTURA ANTERIOR: [R] 24M3 \n")
-            .append("[L]CONSUMO M3: [R] 11M3 \n")
-            .append("[L]VALOR: [R] $ ${String.format("%.2f", 25.50)} \n")
-        * */
-
-
-        val textoImprmir = normalizarTexto(ticket.toString())
-        printer.printFormattedText(textoImprmir)
+        return normalizarTexto(ticket.toString())
     }
 
-    //FUNCION PARA IMPRIMIR EL RECIBO INTREGRADO
+    //Funcion para construir al escala del pliego tarifario
+    private data class EscalonTarifario (
+            val minimoM3: Double,
+            val maximoM3: Double,
+            val ValorM3:  Double,
+            val valorAlcantarillado: Double
+    )
 
-    @SuppressLint("MissingPermission")
-    private fun imprimirReciboIntegrado(context: Context, datos: ConsumoResponse){
+    private fun construirPliegoTarifario(datos: ConsumoResponse): String {
+        val escalones = listOf(
+            EscalonTarifario(datos.e1_minimo_m3, datos.e1_maximo_m3, datos.e1_valor_m3, 2.00),
+            EscalonTarifario(datos.e2_minimo_m3, datos.e2_maximo_m3, datos.e2_valor_m3, 2.00),
+            EscalonTarifario(datos.e3_minimo_m3, datos.e3_maximo_m3, datos.e3_valor_m3, 2.00),
+            EscalonTarifario(datos.e4_minimo_m3, datos.e4_maximo_m3, datos.e4_valor_m3, 3.50),
+            EscalonTarifario(datos.e5_minimo_m3, datos.e5_maximo_m3, datos.e5_valor_m3, 3.50),
+            EscalonTarifario(datos.e6_minimo_m3, datos.e6_maximo_m3, datos.e6_valor_m3, 3.50),
+            EscalonTarifario(datos.e7_minimo_m3, datos.e7_maximo_m3, datos.e7_valor_m3, 3.50),
+            EscalonTarifario(datos.e8_minimo_m3, datos.e8_maximo_m3, datos.e8_valor_m3, 3.50),
+            EscalonTarifario(datos.e9_minimo_m3, datos.e9_maximo_m3, datos.e9_valor_m3, 3.50),
+            EscalonTarifario(datos.e10_minimo_m3, datos.e10_maximo_m3, datos.e10_valor_m3, 3.50)
+        ).filter { it.minimoM3 > 0 }
 
-        // Verificación real antes de acceder a Bluetooth
-        if (!tienePermisoBt()) {
-            Toast.makeText(
-                context,
-                "Permiso Bluetooth no concedido",
-                Toast.LENGTH_LONG
-            ).show()
-            return
-        }
-        preferencias = context.getSharedPreferences(instancia, Context.MODE_PRIVATE)
-        periodo_prefs = PeriodoPreferences(context)
-        var vendedor : String = preferencias.getString("nombreEmpleado", "").toString()
-        var direccion : String = preferencias.getString("dteDireccion","").toString()
-        var empresa : String = preferencias.getString("dteNombreComercial","").toString()
-        var giro : String = preferencias.getString("dteGiro","").toString()
-        var nrc : String = preferencias.getString("dteNrc","").toString()
-        var nit : String = preferencias.getString("dteNit","").toString()
-        var fecha_incio = periodo_prefs.getPeriodoInicio()
-        var fecha_fin = periodo_prefs.getPeriodoFin()
-        var fecha_vencimiento = periodo_prefs.getPeriodoVencimiento()
-
-        val textoPie = "ESTE DOCUMENTO NO TIENE VALIDEZ FISCAL"
-
-        val impresorIntegrado = preferencias.getString("impresorIntegrado", "sinNombre")?:""
-
-        if (impresorIntegrado.isBlank()) {
-            Toast.makeText(
-                context,
-                "No hay impresora integrada configurada",
-                Toast.LENGTH_LONG
-            ).show()
-            return
-        }
-
-        val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
-
-        if (bluetoothAdapter == null) {
-            Toast.makeText(
-                context,
-                "El dispositivo no dispone de Bluetooth",
-                Toast.LENGTH_LONG
-            ).show()
-            return
-        }
-
-        val device = bluetoothAdapter.bondedDevices.firstOrNull(){ device ->
-            Log.d(
-                "IMPRESION_INT",
-                "Vinculado -> Nombre: ${device.name}, MAC: ${device.address}"
-            )
-            device.name?.contains(
-                impresorIntegrado,
-                ignoreCase = true
-            ) == true
-        }
-
-        if(device != null){
-            val connection = BluetoothConnection(device)
-
-            connection.connect()
-
-            val printer = EscPosPrinter(connection, 160, 48f, 28)
-
-            val direccionFormateada = dividirEnLineas(direccion, 31)
-            val empresaFormateada = dividirEnLineas(empresa, 31)
-            val giroFormateada = dividirEnLineas(giro, 31)
-            val textoPieFormateado = dividirEnLineas(textoPie, 31)
-            val nrcFormateado = dividirEnLineas(nrc,31)
-            val nitFormateado = dividirEnLineas(nit, 31)
-            val giroCliente = dividirEnLineas("", 31)
-            val direccionCliente = dividirEnLineas(datos.direccion, 31)
-
-            // ===============================
-            // Preparar logo y texto
-            // ===============================
-            val prefs = context.getSharedPreferences("MisImagenes", MODE_PRIVATE)
-            val filePath = prefs.getString("imagenFile", null)
-
-            // Variable para el logo final
-            val logoOriginal: Bitmap = if (filePath != null) {
-                val file = File(filePath)
-                if (file.exists()) {
-                    BitmapFactory.decodeFile(file.absolutePath)
-                } else {
-                    BitmapFactory.decodeResource(context.resources, R.drawable.nologo)
-                }
+        return buildString {
+            val rangoInicial = if (escalones.isEmpty()) {
+                "0 A MAS"
             } else {
-                BitmapFactory.decodeResource(context.resources, R.drawable.nologo)
+                "0 A ${datos.primeros_m3.toInt()}M3"
             }
+            append(
+                filaTablaTarifario(
+                    rangoInicial,
+                    formatearMoneda(datos.primeros_m3_valor),
+                    formatearMoneda(2.00)
+                )
+            )
 
-            // Redimensionar
-            val logoRedimensionado = redimensionarLogo(logoOriginal, 384)
-
-
-            // ===============================
-            // Construir ticket Normal
-            // ===============================
-            val ticket = StringBuilder()
-                .append("[C]<img>")
-                .append(PrinterTextParserImg.bitmapToHexadecimalString(printer, logoRedimensionado))
-                .append("</img>\n")
-                .append("[C]AVISO DE COBRO\n\n")
-                .append("LECTURA MICROMEDIDOR\n")
-                .append("[C]$empresaFormateada\n")
-                .append("[C]$direccionFormateada\n")
-                .append("[C]$nrc\n")
-                .append("[C]$nit\n")
-                .append("[C]$giroFormateada\n")
-                .append("[L]-------------------------------\n")
-                .append("[C]PERIODO DEL: $fecha_incio \n")
-                .append("[C]AL: $fecha_fin \n")
-                .append("[L]-------------------------------\n")
-                .append("[C]CARGO FIJO\n")
-                .append(String.format("[L]%-23s%8s\n", "DESCRIPCION", "VALOR"))
-                .append("[L]-------------------------------\n")
-                .append(construirCargoFijo(datos))
-                .append("[L]-------------------------------\n\n")
-                .append("[C]CARGO POR CONSUMO\n")
-                .append(String.format("[L]%-12s%9s%9s\n", "DESCRIPCION", "VALOR", "ALCANT."))
-                .append("[L]-------------------------------\n")
-                .append(filaTablaTarifario("0  A ${datos.primeros_m3.toInt()} M3", "$${datos.primeros_m3_valor}", "$ 2.00"))
-                .append(filaTablaTarifario("${datos.e1_minimo_m3.toInt()} A ${datos.e1_maximo_m3.toInt()}M3", "$ ${datos.e1_valor_m3}", "$ 2.00"))
-                .append(filaTablaTarifario("${datos.e2_minimo_m3.toInt()} A ${datos.e2_maximo_m3.toInt()}M3", "$ ${datos.e2_valor_m3}", "$ 2.00"))
-                .append(filaTablaTarifario("${datos.e3_minimo_m3.toInt()} A ${datos.e3_maximo_m3.toInt()}M3", "$ ${datos.e3_valor_m3}", "$ 2.00"))
-                .append(filaTablaTarifario("${datos.e4_minimo_m3.toInt()} A ${datos.e4_maximo_m3.toInt()}M3", "$ ${datos.e4_valor_m3}", "$ 3.50"))
-                .append(filaTablaTarifario("${datos.e5_minimo_m3.toInt()} A ${datos.e5_maximo_m3.toInt()}M3", "$ ${datos.e5_valor_m3}", "$ 3.50"))
-                .append(filaTablaTarifario("${datos.e6_minimo_m3.toInt()} A ${datos.e6_maximo_m3.toInt()}M3", "$ ${datos.e6_valor_m3}", "$ 3.50"))
-                .append(filaTablaTarifario("${datos.e7_minimo_m3.toInt()} A ${datos.e7_maximo_m3.toInt()}M3", "$ ${datos.e7_valor_m3}", "$ 3.50"))
-                .append(filaTablaTarifario("${datos.e8_minimo_m3.toInt()} A MAS", "$ ${datos.e8_valor_m3}", "$ 3.50"))
-                .append("[L]-------------------------------\n")
-                .append("[C]DATOS DEL CLIENTE\n")
-                .append("[L]-------------------------------\n")
-                .append("[C]FECHA: ${fhformato} \n")
-                .append("[L]NUM DE CUENTA: <u><font size='big'>${datos.cuenta}</font></u>\n")
-                .append("[L]NOMBRE:\n")
-                .append("[C]${datos.nombre}\n")
-                .append("[L]DOCUMENTO: ${datos.documento} \n")
-                .append("[L]DIRECCION: \n")
-                .append("[L]$direccionCliente\n")
-                .append("[L]-------------------------------\n")
-                .append("[C]DETALLE DEL DOCUMENTO\n")
-                .append("[L]-------------------------------\n")
-                .append(String.format("[L]%-12s%12s\n", "L.ACT.", "L.ANTE."))
-                .append(filaTablaLecturas1("${datos.lecturaActual}M3", "${datos.lecturaAnterior}M3"))
-                .append("[L]-------------------------------\n")
-                .append(String.format("[L]%-12s%12s\n", "CONS. M3.", "VALOR"))
-                .append(filaTablaLecturas2("${datos.consumo}M3", "   $ ${String.format("%.2f", 0.72)}"))
-                .append("[L]-------------------------------\n")
-                .append(String.format("[L]%-12s%3s%6s%6S\n", "", "", "  PRECIO", ""))
-                .append(String.format("[L]%-12s%3s%6s%6S\n", "  DESCRIP", "CANT", "UNI.", "  TOTAL"))
-                .append("[L]-------------------------------\n")
-                .append(filaTablaTotales("COST. ADMIN", "1", "$ ${String.format("%.2f", 3.58)}", "$ ${String.format("%.2f", 3.58)}"))
-                .append(filaTablaTotales("MANTTO. SIST. AGUA POTABLE", "1", "$ ${String.format("%.2f", 4.42)}", "$ ${String.format("%.2f", 4.42)}"))
-                .append(filaTablaTotales("CONSU. AGUA M3", "3", "$ ${String.format("%.2f", 0.24)}", "$ ${String.format("%.2f", 0.72)}"))
-                .append(filaTablaTotales("CANON POR M3", "3", "$ ${String.format("%.2f", 0.07)}", "$ ${String.format("%.2f", 0.21)}"))
-                .append(filaTablaTotales("MANTTO ALCANT. SANITARIO", "1", "$ ${String.format("%.2f", 2.00)}", "$ ${String.format("%.2f", 2.00)}"))
-                .append(filaTablaTotales("PAGO DE NOVIEMBRE", "1", "\$ ${String.format("%.2f", 0.00)}", "$ ${String.format("%.2f", 0.00)}"))
-                .append("[L]-------------------------------\n")
-                .append(filaTablaTotales("TOTAL", "", "", "$ ${String.format("%.2f", 10.93)}"))
-                .append("[L]-------------------------------\n\n")
-                .append("[L]ENTREGADO POR: ${vendedor}\n")
-                .append("[C]<b>$textoPieFormateado</b>\n")
-                .append(" \n")
-
-            val textoImprmir = normalizarTexto(ticket.toString())
-            printer.printFormattedText(textoImprmir)
-
-        }else{
-            Toast.makeText(context, "NO ENCONTRADO", Toast.LENGTH_SHORT)
-                .show()
+            escalones.forEachIndexed{ index, escalon ->
+                val rango = if (index == escalones.lastIndex){
+                    "${escalon.minimoM3.toInt()} A MAS"
+                }else {
+                    "${escalon.minimoM3.toInt()} A ${escalon.maximoM3.toInt()}M3"
+                }
+                append(
+                    filaTablaTarifario(
+                        rango,
+                        formatearMoneda(escalon.ValorM3),
+                        formatearMoneda(escalon.valorAlcantarillado)
+                    )
+                )
+            }
         }
-
     }
 
     //Funcion para simular una tabla

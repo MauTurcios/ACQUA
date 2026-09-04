@@ -17,7 +17,7 @@ class Database(context: Context) : SQLiteOpenHelper(
 
     companion object{
         private const val DATABASE_VERSION =1 //version de la bd
-        private const val DATABASE_NAME = "acqua.db" //nombre de la bd
+        private const val DATABASE_NAME = "Acqua.db" //nombre de la bd
     }
 
     override fun onCreate(db: SQLiteDatabase?) {

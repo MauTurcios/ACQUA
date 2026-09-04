@@ -51,6 +51,7 @@ class AvisoLecturaAnterior: AppCompatActivity() {
     private var idPeriodo: Int = 0
     private var actividad: String =""
     private var idLecturaDetalle: Int = 0
+    private var isProcessing  = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,17 +60,6 @@ class AvisoLecturaAnterior: AppCompatActivity() {
         setContentView(binding.root)
         iniVar()
         onBackPressedDispatcher.addCallback(this){}
-    }
-
-    private fun iniVar(){
-        preferencias = getSharedPreferences(instancia, MODE_PRIVATE)
-        periodo_prefs = PeriodoPreferences(this@AvisoLecturaAnterior)
-        alert = AlertDialogo(this@AvisoLecturaAnterior, this)
-        cuenta = intent.getStringExtra("cuenta").toString()
-        actividad = intent.getStringExtra("actividad").toString()
-        lecturaVM = ViewModelProvider(this)[lecturaViewModel::class.java]
-        idPeriodo = periodo_prefs.getIdPeriodo()
-        idLecturaDetalle = intent.getIntExtra("Id_lectura_detalle", 0)
     }
 
     override fun onStart() {
@@ -95,7 +85,22 @@ class AvisoLecturaAnterior: AppCompatActivity() {
         Log.d("PROVIENE",actividad)
     }
 
+    private fun iniVar(){
+        preferencias = getSharedPreferences(instancia, MODE_PRIVATE)
+        periodo_prefs = PeriodoPreferences(this@AvisoLecturaAnterior)
+        alert = AlertDialogo(this@AvisoLecturaAnterior, this)
+        cuenta = intent.getStringExtra("cuenta").toString()
+        actividad = intent.getStringExtra("actividad").toString()
+        lecturaVM = ViewModelProvider(this)[lecturaViewModel::class.java]
+        idPeriodo = periodo_prefs.getIdPeriodo()
+        idLecturaDetalle = intent.getIntExtra("Id_lectura_detalle", 0)
+    }
+
     private fun procesarLecturaAnterior(cuenta: String, lAnterior: Double, idLectura: Int){
+        if (isProcessing) return
+
+        isProcessing = true
+        binding.btnEnviar.isEnabled = false
         alert!!.Cargando()
         val baseUrl = funciones.obtenerServidor(this)
         val api = RetrofitCliente.obtenerApi(baseUrl)
@@ -157,6 +162,10 @@ class AvisoLecturaAnterior: AppCompatActivity() {
                     ).show()
                     Log.e("API", "[PROCESAR_LECTURA_ANTERIOR ELSE] Error conexión")
                 }
+            }
+            withContext(Dispatchers.Main){
+                isProcessing = false
+                binding.btnEnviar.isEnabled = true
             }
         }
     }

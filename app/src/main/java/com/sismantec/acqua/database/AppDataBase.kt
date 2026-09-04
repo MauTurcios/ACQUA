@@ -4,15 +4,14 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.sismantec.acqua.dao.ClientesDAO
 import com.sismantec.acqua.dao.ConfigDAO
 import com.sismantec.acqua.dao.LecturaDAO
-import com.sismantec.acqua.entities.ClientesEntity
-import com.sismantec.acqua.entities.RutasEntity
 import com.sismantec.acqua.dao.RutasDAO
+import com.sismantec.acqua.entities.ClientesEntity
 import com.sismantec.acqua.entities.ConfigEntity
 import com.sismantec.acqua.entities.LecturaEntity
+import com.sismantec.acqua.entities.RutasEntity
 
 @Database(
     entities = [ClientesEntity::class, RutasEntity::class, ConfigEntity::class, LecturaEntity::class]
@@ -27,24 +26,28 @@ abstract class AppDataBase : RoomDatabase() {
     abstract fun LecturaDAO(): LecturaDAO
 
     companion object{
+        const val DATABASE_NAME ="Acqua.db"
 
         @Volatile
         private var INSTANCE: AppDataBase? = null
-        fun obtenerInstancia(context: Context) : AppDataBase{
 
+        fun obtenerInstancia(context: Context) : AppDataBase{
             return INSTANCE ?: synchronized(this){
                 INSTANCE ?: Room.databaseBuilder(
                     context.applicationContext,
                     AppDataBase::class.java,
-                    "Acqua.db"
+                    DATABASE_NAME
                 ).fallbackToDestructiveMigration()
-                    .build().also {
-                    INSTANCE = it
-                }
+                    .build()
+                    .also {INSTANCE = it }
             }
-
         }
 
+        fun cerrarInstancia(){
+            synchronized(this){
+                INSTANCE?.close()
+                INSTANCE =null
+            }
+        }
     }
-
 }
