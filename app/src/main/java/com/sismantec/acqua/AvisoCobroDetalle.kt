@@ -24,6 +24,8 @@ import com.sismantec.acqua.models.LecturaRequest
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.sismantec.acqua.models.ConsumoResponse
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class AvisoCobroDetalle: AppCompatActivity() {
     private lateinit var binding: ActivityLecturaDetalleBinding
@@ -40,6 +42,7 @@ class AvisoCobroDetalle: AppCompatActivity() {
     private var alert: AlertDialogo?=null
     private lateinit var impresionController: ImpresionController
     private var imprimiendo = false
+    private var isProcessing  = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -137,6 +140,11 @@ class AvisoCobroDetalle: AppCompatActivity() {
 
     //FUNCION PARA PROCESAR LA LECTURA
     private fun procesarLecturaPendiente(lectura: LecturaEntity) {
+        if(isProcessing) return
+
+        isProcessing = true
+        binding.btnImprimirAviso.isEnabled = false
+        binding.btnEnviarPendiente.isEnabled = false
         alert!!.Cargando()
         val baseUrl = funciones.obtenerServidor(this)
         val api = RetrofitCliente.obtenerApi(baseUrl)
@@ -195,7 +203,7 @@ class AvisoCobroDetalle: AppCompatActivity() {
                             cf1_linea = consumoResponse.cf1_linea,
                             cf1_descripcion = consumoResponse.cf1_descripcion,
                             cf1_precio = consumoResponse.cf1_precio,
-                            cf2_linea = consumoResponse.cf1_linea,
+                            cf2_linea = consumoResponse.cf2_linea,
                             cf2_descripcion = consumoResponse.cf2_descripcion,
                             cf2_precio = consumoResponse.cf2_precio,
                             cf3_linea = consumoResponse.cf3_linea,
@@ -227,7 +235,7 @@ class AvisoCobroDetalle: AppCompatActivity() {
                             e5_maximo_m3 = consumoResponse.e5_maximo_m3,
                             e5_valor_m3 = consumoResponse.e5_valor_m3,
                             e6_minimo_m3 = consumoResponse.e6_minimo_m3,
-                            e6_maximo_m3 = consumoResponse.e6_minimo_m3,
+                            e6_maximo_m3 = consumoResponse.e6_maximo_m3,
                             e6_valor_m3 = consumoResponse.e6_valor_m3,
                             e7_minimo_m3 = consumoResponse.e7_minimo_m3,
                             e7_maximo_m3 = consumoResponse.e7_maximo_m3,
@@ -272,6 +280,11 @@ class AvisoCobroDetalle: AppCompatActivity() {
                         Toast.LENGTH_LONG
                     ).show()
                 }
+            }
+            withContext(Dispatchers.Main){
+                isProcessing = false
+                binding.btnImprimirAviso.isEnabled = true
+                binding.btnEnviarPendiente.isEnabled = true
             }
         }
     }

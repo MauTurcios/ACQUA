@@ -55,6 +55,7 @@ class AvisoCobro : AppCompatActivity() {
     private val instancia = "CONFIG_SERVIDOR"
     private var vendedor : String = ""
     private lateinit var preferencias: SharedPreferences
+    private var isProcessing  = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -121,6 +122,10 @@ class AvisoCobro : AppCompatActivity() {
 
     //FUNCION PARA PROCESAR LECTURA
     private fun procesarLectura(cuenta: String, lectura: Double, idLectura: Int, empleado: String, onResult: (ConsumoResponse) -> Unit) {
+        if(isProcessing) return
+
+        isProcessing = true
+        binding.btnEnviar.isEnabled = false
         alert!!.Cargando()
         val baseUrl = funciones.obtenerServidor(this)
         val api = RetrofitCliente.obtenerApi(baseUrl)
@@ -192,6 +197,10 @@ class AvisoCobro : AppCompatActivity() {
                     usuario = empleado
                 )
                 Log.e("API", "[PROCESAR LECTURA] Error conexión")
+            }
+            withContext(Dispatchers.Main){
+                isProcessing = true
+                binding.btnEnviar.isEnabled = true
             }
         }
     }

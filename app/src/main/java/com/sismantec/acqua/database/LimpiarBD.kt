@@ -11,7 +11,7 @@ class LimpiarBD {
     //-----------------------------------------
     private lateinit var preferences: SharedPreferences
     fun limpiarBdAlActualizar(context: Context){
-        Room.databaseBuilder(context,AppDataBase::class.java, "Acae.db")
+        Room.databaseBuilder(context,AppDataBase::class.java, "acqua.db")
             .fallbackToDestructiveMigration()
             .build()
     }

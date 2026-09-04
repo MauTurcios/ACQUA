@@ -16,7 +16,7 @@ import com.sismantec.acqua.entities.LecturaEntity
 
 @Database(
     entities = [ClientesEntity::class, RutasEntity::class, ConfigEntity::class, LecturaEntity::class]
-    , version = 4
+    , version = 5
     , exportSchema = false
 )
 abstract class AppDataBase : RoomDatabase() {
