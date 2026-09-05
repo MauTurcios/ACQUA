@@ -60,13 +60,11 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:3.0.0")
 
     // Corutinas (opcional pero muy recomendado)
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
 
     // OkHttp Logging (para ver las peticiones)
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
     //ROOM
     implementation ("androidx.room:room-runtime:2.6.1")
@@ -81,8 +79,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.5")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.5")
 
-    // ViewModel + coroutines
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
 
     //IMPLEMENTANDO LIBRERIA ESCPOSTPRINTER
     implementation (files("libs/escposprinter-release.aar"))

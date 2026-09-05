@@ -3,26 +3,17 @@ package com.sismantec.acqua.controller
 import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.hardware.usb.UsbDevice
-import android.hardware.usb.UsbManager
-import android.print.PrintManager
 import android.util.Log
 import android.widget.Toast
-import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
 import androidx.core.graphics.scale
 import com.dantsu.escposprinter.EscPosPrinter
 import com.dantsu.escposprinter.connection.bluetooth.BluetoothConnection
-import com.dantsu.escposprinter.connection.bluetooth.BluetoothPrintersConnections
-import com.dantsu.escposprinter.connection.usb.UsbConnection
 import com.dantsu.escposprinter.textparser.PrinterTextParserImg
-import com.sismantec.acqua.Login
-import com.sismantec.acqua.Periodo
 import com.sismantec.acqua.R
 import com.sismantec.acqua.Util.PeriodoPreferences
 import com.sismantec.acqua.funciones.Funciones
@@ -49,81 +40,102 @@ class ImpresionController(private val context: Context) {
     //val config = Operativo(context)
     private val mutexImpresion = Mutex()
 
-    //FUNCION PARA DETERMINAR LA CONEXION DE LA IMPRESORA
+    //FUNCION PARA DETERMINAR LA CONEXION DE LA IMPRESORA E IMPRIMIR TICKET
+    @SuppressLint("MissingPermission")
     fun imprimirRecibo(context: Context, datos: ConsumoResponse, onFinalizado: () -> Unit={}) {
-        try {
-            preferencias = context.getSharedPreferences(instancia, Context.MODE_PRIVATE)
-            val tipoImpresora = preferencias.getString("tipoImpresora", "")
-            when(tipoImpresora){
-                "BT" -> {
-                    if (!tienePermisoBt()){
-                        Toast.makeText(context,"Permiso Bluetooth no concedido", Toast.LENGTH_LONG).show()
-                        return
-                    }
-                    // ===============================
-                    // Si no hay USB, probar Bluetooth
-                    // ===============================
-                    CoroutineScope(Dispatchers.IO).launch {
-                        mutexImpresion.withLock {
-                            try {
-                                val btConnection = BluetoothPrintersConnections.selectFirstPaired()
-                                if (btConnection != null){
-                                    imprimirTicket(btConnection,context,datos)
-                                }else{
-                                    withContext(Dispatchers.Main){
-                                        Toast.makeText(context,"No se encontró impresora bluetooth",Toast.LENGTH_LONG).show()
-                                    }
-                                }
-                            }catch (e: Exception){
-                                Log.e("IMPRESION_CONTROLLER_BT","[IMPRESION_CONTROLLER_BT] Error al imprimir",e)
-                                withContext(Dispatchers.Main) {
-                                    Toast.makeText(
-                                        context,
-                                        "Error al imprimir: ${e.message}",
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                }
-                            }finally {
-                                withContext(Dispatchers.Main){
-                                    onFinalizado()
-                                }
-                            }
+
+        if (!tienePermisoBt()) {
+            Toast.makeText(context, "Permiso Bluetooth no concedido", Toast.LENGTH_LONG).show()
+            onFinalizado()
+            return
+        }
+        preferencias = context.getSharedPreferences(instancia, Context.MODE_PRIVATE)
+
+        val nombreImpresora = preferencias.getString("impresorIntegrado", "").orEmpty().trim()
+        if (nombreImpresora.isBlank()) {
+            Toast.makeText(context, "No hay impresora configurada", Toast.LENGTH_SHORT).show()
+            onFinalizado()
+            return
+        }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            mutexImpresion.withLock {
+                try {
+                    val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+
+                    if (bluetoothAdapter == null) {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(
+                                context,
+                                "El dispositivo no dispone de Bluetooth",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
+                        return@withLock
                     }
-                }
-                "INT" ->{
-                    if (!tienePermisoBt()){
-                        Toast.makeText(context,"Permiso Bluetooth no concedido", Toast.LENGTH_LONG).show()
-                        onFinalizado()
-                        return
-                    }
-                    // ===============================
-                    // Detectar impresora Integrada
-                    // ===============================
-                    try {
-                        imprimirReciboIntegrado(context,datos)
-                    }catch (e: Exception){
-                        Log.e("IMPRESION_CONTROLLER","Error al imprimir",e)
-                        Toast.makeText(context,"Error al imprimir: ${e.message}", Toast.LENGTH_LONG).show()
-                    }finally {
-                        onFinalizado()
+                    val device = bluetoothAdapter.bondedDevices.firstOrNull() { device ->
+                        Log.d(
+                            "IMPRESION_CONTROLLER",
+                            "Vinculado -> Nombre: ${device.name}, MAC: ${device.address}"
+                        )
+                        device.name?.equals(nombreImpresora, ignoreCase = true) == true
+
                     }
 
-                }
-                else -> {
-                    Toast.makeText(context,"No se ha configurado una impresora", Toast.LENGTH_LONG).show()
-                    onFinalizado()
+                    if (device == null) {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(
+                                context,
+                                "No se encontró la impresora configurada",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        return@withLock
+                    }
+
+                    val connection = BluetoothConnection(device)
+                    try {
+                        connection.connect()
+                        val printer = EscPosPrinter(
+                            connection,
+                            160,
+                            48f,
+                            28
+                        )
+                        printer.printFormattedText(
+                            construirTicket(
+                                printer = printer,
+                                context = context,
+                                datos = datos
+                            )
+                        )
+                    } finally {
+                        try {
+                            connection.disconnect()
+                        } catch (e: Exception) {
+                            Log.e("IMPRESION_CONTROLLER", "Error cerrando conexión", e)
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e("IMPRESION_CONTROLLER", "Error al imprimir", e)
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(
+                            context,
+                            "Error al imprimir: ${e.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                } finally {
+                    withContext(Dispatchers.Main) {
+                        onFinalizado()
+                    }
                 }
             }
-        } catch (e: Exception) {
-            Log.e("IMPRESION_CONTROLLER","Error al imprimir: $e",e)
-            Toast.makeText(context, "Error al imprimir: ${e.message}", Toast.LENGTH_LONG).show()
-            onFinalizado()
         }
     }
 
 
-    //FUNCION DEL FORMATO DEL TICKET
+    /*/FUNCION PARA IMPRIMIR TICKET BT
     private suspend fun imprimirTicket(connection: Any, context: Context, datos: ConsumoResponse) {
         val usbManager = context.getSystemService(Context.USB_SERVICE) as UsbManager
 
@@ -141,8 +153,10 @@ class ImpresionController(private val context: Context) {
             )
         )
     }
+     */
 
-    //FUNCION PARA IMPRIMIR EL RECIBO INTREGRADO
+
+    /*/FUNCION PARA IMPRIMIR EL RECIBO INTREGRADO
     @SuppressLint("MissingPermission")
     private fun imprimirReciboIntegrado(context: Context, datos: ConsumoResponse){
 
@@ -193,6 +207,8 @@ class ImpresionController(private val context: Context) {
             Toast.makeText(context, "IMPRESOR NO ENCONTRADO", Toast.LENGTH_SHORT).show()
         }
     }
+
+     */
 
     //CONSTRUIR FORMATO DEL TICKET
     private fun construirTicket(printer: EscPosPrinter, context: Context,datos: ConsumoResponse)
@@ -249,8 +265,8 @@ class ImpresionController(private val context: Context) {
             .append("[C]$nit\n")
             .append("[C]$giroFormateado\n")
             .append("[L]-------------------------------\n")
-            .append("[C]PERIODO DEL: $fechaFin \n")
-            .append("[C]AL: $fechaInicio \n")
+            .append("[C]PERIODO DEL: $fechaInicio \n")
+            .append("[C]AL: $fechaFin \n")
             .append("[L]-------------------------------\n")
             .append("[C]CARGO FIJO\n")
             .append(String.format("[L]%-23s%8s\n", "DESCRIPCION", "VALOR"))

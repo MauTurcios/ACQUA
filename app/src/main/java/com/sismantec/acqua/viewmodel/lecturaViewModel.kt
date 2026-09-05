@@ -14,7 +14,7 @@ class lecturaViewModel (application: Application): AndroidViewModel(application)
     private val db = AppDataBase.obtenerInstancia(application)
     private val lecturaDAO = db.LecturaDAO()
 
-    fun guardarLectura(datos: ConsumoResponse){
+    fun guardarLectura(datos: ConsumoResponse, callback: () -> Unit = {}){
         viewModelScope.launch {
             val lectura = LecturaEntity(
                 Cuenta = datos.cuenta,
@@ -85,6 +85,7 @@ class lecturaViewModel (application: Application): AndroidViewModel(application)
                 E10_valor_m3 = datos.e10_valor_m3
             )
             lecturaDAO.insertar(lectura)
+            callback()
         }
     }
 

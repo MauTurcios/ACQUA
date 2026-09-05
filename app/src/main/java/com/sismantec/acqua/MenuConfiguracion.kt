@@ -109,15 +109,6 @@ class MenuConfiguracion : AppCompatActivity() {
         binding.texempresa.setText(nombreEmpresa)
         alerta = AlertDialogo(this@MenuConfiguracion, this)
 
-        //Ocultando Controles de Impresor
-        if(preferencias.getString("tipoImpresora", "") == "BT"){
-            binding.lyImpresor.visibility = View.GONE
-        }
-
-        //ACTIVANDO SWITCH DE IMRPESORES
-        binding.swBluetooth.isChecked = preferencias.getString("tipoImpresora", "") == "BT"
-        binding.swIntegrada.isChecked = preferencias.getString("tipoImpresora", "") == "INT"
-
         // Recuperar la imagen guardada al iniciar
         val prefs = getSharedPreferences("MisImagenes", MODE_PRIVATE)
         val filePath = prefs.getString("imagenFile", null)
@@ -178,41 +169,6 @@ class MenuConfiguracion : AppCompatActivity() {
             finish()
         }
 
-        //ACTIVANDO LOGICA DE SWITCH DE IMPRESORES
-        binding.swBluetooth.setOnCheckedChangeListener { _, isChecked ->
-            preferencias.edit {
-                remove("tipoImpresora")
-                if (isChecked) {
-                    binding.swIntegrada.isChecked = false
-                    putString("tipoImpresora", "BT")
-                    binding.lyImpresor.visibility = View.GONE
-                    remove("impresorIntegrado")
-                } else {
-                    binding.swIntegrada.isChecked = true
-                    putString("tipoImpresora", "INT")
-                    binding.lyImpresor.visibility = View.VISIBLE
-                }
-            }
-
-        }
-
-        binding.swIntegrada.setOnCheckedChangeListener { _, isChecked ->
-            preferencias.edit {
-                remove("tipoImpresora")
-                if (isChecked) {
-                    binding.swBluetooth.isChecked = false
-                    putString("tipoImpresora", "INT")
-                    binding.lyImpresor.visibility = View.VISIBLE
-                } else {
-                    binding.swBluetooth.isChecked = true
-                    putString("tipoImpresora", "BT")
-                    binding.lyImpresor.visibility = View.GONE
-                    remove("impresorIntegrado")
-                }
-            }
-
-        }
-
         binding.btnImpresor.setOnClickListener {
 
             val impresor = nombreImpresor
@@ -221,7 +177,7 @@ class MenuConfiguracion : AppCompatActivity() {
                 preferencias.edit{
                     remove("impresorIntegrado")
                     putString("impresorIntegrado", impresor)
-                    Toast.makeText(this@MenuConfiguracion, "IMPRESOR CONFIGURADO", Toast.LENGTH_SHORT)
+                    Toast.makeText(this@MenuConfiguracion, "IMPRESOR CONFIGURADO: ${impresor}", Toast.LENGTH_SHORT)
                         .show()
                 }
             }else{

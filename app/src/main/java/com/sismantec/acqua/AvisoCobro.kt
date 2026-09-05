@@ -1,21 +1,14 @@
 package com.sismantec.acqua
 
-import android.Manifest
 import android.app.Dialog
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.service.autofill.ImageTransformation
 import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
-import androidx.annotation.CallSuper
-import androidx.annotation.MainThread
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.sismantec.acqua.Util.PeriodoPreferences
@@ -23,11 +16,9 @@ import com.sismantec.acqua.apiservices.RetrofitCliente
 import com.sismantec.acqua.controller.ImpresionController
 import com.sismantec.acqua.database.AppDataBase
 import com.sismantec.acqua.databinding.ActivityAvisoCobroBinding
-import com.sismantec.acqua.entities.ClientesEntity
 import com.sismantec.acqua.entities.LecturaEntity
 import com.sismantec.acqua.funciones.Funciones
 import com.sismantec.acqua.models.ConsumoResponse
-import com.sismantec.acqua.viewmodel.clienteViewModel
 import com.sismantec.acqua.models.LecturaRequest
 import com.sismantec.acqua.viewmodel.lecturaViewModel
 import kotlinx.coroutines.Dispatchers
@@ -40,11 +31,6 @@ class AvisoCobro : AppCompatActivity() {
     private lateinit var binding: ActivityAvisoCobroBinding
     //private lateinit var clienteVM: clienteViewModel
     private lateinit var lecturaVM: lecturaViewModel
-    //private lateinit var txtCodigo: TextView
-    //private lateinit var txtCliente: TextView
-    //private lateinit var txtCasa: TextView
-    //private lateinit var direccion: TextView
-    //private var idCliente : Int = 0
     private lateinit var impressionController: ImpresionController
     //private var clienteLectura: ClientesEntity? = null
     private var funciones = Funciones()
@@ -70,6 +56,17 @@ class AvisoCobro : AppCompatActivity() {
         onBackPressedDispatcher.addCallback(this){}
         periodo_concepto = periodo_prefs.getPeriodoConcepto()
         idPeriodo = periodo_prefs.getIdPeriodo()
+
+        val cuentaRecuperada = intent.getStringExtra("cuenta")
+        val lecturaRecuperada = intent.getDoubleExtra("lectura_actual", Double.NaN)
+        Log.d("AVISO","DATOS RECIBIDOS DE ANTERIOR: ${cuentaRecuperada}, ${lecturaRecuperada}")
+
+        if (!cuentaRecuperada.isNullOrBlank()){
+            binding.txtClienteLectura.setText(cuentaRecuperada)
+        }
+        if (!lecturaRecuperada.isNaN()){
+            binding.txtLectura.setText(lecturaRecuperada.toString())
+        }
     }
 
     override fun onStart() {
@@ -109,14 +106,17 @@ class AvisoCobro : AppCompatActivity() {
                         ).show()
                     return@existeLecturaPendiente
                 }
+
                 //SI LA CUENTA NO TIENE UNA LECTURA PENDIENTE REGISTRADA
                 procesarLectura(cuenta,lecturaTxt,idPeriodo,vendedor){
                         consumo ->
-                    lecturaVM.guardarLectura(consumo)
-                    actAvisoCobro()
+                    lecturaVM.guardarLectura(consumo) {
+                        impressionController.imprimirRecibo(this@AvisoCobro,consumo){
+                            actAvisoCobro()
+                        }
+                    }
                 }
             }
-
         }
     }
 
@@ -156,12 +156,6 @@ class AvisoCobro : AppCompatActivity() {
                             }
                             onResult(consumoResponse)
                         }
-
-                        //IMPRIMIR TICKET
-                        val consumo = response.body()
-                        if (consumo != null){
-                            impressionController.imprimirRecibo(this@AvisoCobro,consumo)
-                        }
                     } else {
                         val mensaje = response.errorBody()
                             ?.string()?.trim()?.removeSurrounding("\"")
@@ -172,7 +166,8 @@ class AvisoCobro : AppCompatActivity() {
                             Toast.makeText(this@AvisoCobro, mensaje, Toast.LENGTH_LONG).show()
                             if (mensaje == "ULTIMA_LECTURA_REQUERIDA"){
                                 mensajeLecturaAnterior(
-                                    cuenta = cuenta
+                                    cuenta = cuenta,
+                                    lecturaActual = lectura
                                 )
                             }
                         }
@@ -321,7 +316,7 @@ class AvisoCobro : AppCompatActivity() {
     }
 
     //FUNCION QUE MUESTRA EL MENSAJE EN CASO NO EXISTA LECTURA ANTERIOR
-    private fun mensajeLecturaAnterior(cuenta: String){
+    private fun mensajeLecturaAnterior(cuenta: String, lecturaActual: Double){
         val lAnteriorDialog = Dialog(this,R.style.Theme_Dialog)
         lAnteriorDialog.setCancelable(false)
         lAnteriorDialog.setContentView(R.layout.dialog_lectura_anterior)
@@ -330,7 +325,7 @@ class AvisoCobro : AppCompatActivity() {
         val cancelLectura = lAnteriorDialog.findViewById<TextView>(R.id.cancelLectura)
 
         procesarAnterior.setOnClickListener {
-            actLecturaAnterior(cuenta)
+            actLecturaAnterior(cuenta, lecturaActual)
             lAnteriorDialog.dismiss()
         }
         cancelLectura.setOnClickListener {
@@ -348,10 +343,12 @@ class AvisoCobro : AppCompatActivity() {
     }
 
     //FUNCION QUE ENVÍA A ACTIVIDAD AvisoLecturaAnterior
-    private fun actLecturaAnterior(cuenta: String){
+    private fun actLecturaAnterior(cuenta: String, lecturaActual: Double){
         Log.d("AVISO","CERRANDO ACTIVIDAD")
+        Log.d("AVISO","DATOS ENVIADOS A LECTURA ANTERIOR: ${lecturaActual}, ${cuenta}")
         val intent = Intent(this@AvisoCobro, AvisoLecturaAnterior::class.java)
         intent.putExtra("cuenta",cuenta)
+        intent.putExtra("lectura_actual", lecturaActual)
         intent.putExtra("actividad","AVISO_COBRO")
         startActivity(intent)
         finish()

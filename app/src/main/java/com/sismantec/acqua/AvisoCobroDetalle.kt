@@ -104,7 +104,7 @@ class AvisoCobroDetalle: AppCompatActivity() {
     }
 
     //FUNCION PARA CARGA DE DATOS
-    private fun cargarDatosLectura() {
+    private fun cargarDatosLectura(onCargada: () -> Unit ={}) {
         lecturaVM.obtenerLecturaId(idLecturaDetalle) { lectura ->
             if (lectura != null) {
 
@@ -132,6 +132,8 @@ class AvisoCobroDetalle: AppCompatActivity() {
                     }else{
                         View.GONE
                     }
+
+                onCargada()
             } else {
                 Log.e("LECTURA_DETALLE", "No se encontró la lectura: $idLecturaDetalle")
             }
@@ -150,22 +152,18 @@ class AvisoCobroDetalle: AppCompatActivity() {
         val api = RetrofitCliente.obtenerApi(baseUrl)
 
         lifecycleScope.launch {
-            val hayInternet = funciones.isInternetAvailable(this@AvisoCobroDetalle)
-            runOnUiThread {
+            try {
+                val hayInternet = funciones.isInternetAvailable(this@AvisoCobroDetalle)
                 alert!!.changeText("ENVIANDO LECTURA")
-            }
-            if (!hayInternet) {
-                runOnUiThread {
-                    alert?.dismisss()
+
+                if (!hayInternet) {
                     Toast.makeText(
                         this@AvisoCobroDetalle,
                         "No hay conexión a Internet",
                         Toast.LENGTH_LONG
                     ).show()
+                    return@launch
                 }
-                return@launch
-            }
-            try {
                 val response = api.procesarLectura(
                     LecturaRequest(
                         cuenta = lectura.Cuenta,
@@ -177,13 +175,8 @@ class AvisoCobroDetalle: AppCompatActivity() {
                 if (response.isSuccessful) {
                     response.body()?.let { consumoResponse ->
                         delay(1500)
-                        runOnUiThread {
-                            alert!!.changeText("LECTURA PROCESADA CON EXITO")
-                        }
+                        alert!!.changeText("LECTURA PROCESADA CON EXITO")
                         delay(1500)
-                        runOnUiThread {
-                            alert?.dismisss()
-                        }
                         lecturaVM.marcarLecturaEnviada(
                             id = lectura.id,
                             nombre = consumoResponse.nombre,
@@ -250,8 +243,12 @@ class AvisoCobroDetalle: AppCompatActivity() {
                             e10_maximo_m3 = consumoResponse.e10_maximo_m3,
                             e10_valor_m3 = consumoResponse.e10_valor_m3
                         ) {
-                            cargarDatosLectura()
-                            impresionController.imprimirRecibo(this@AvisoCobroDetalle,consumoResponse)
+                            cargarDatosLectura {
+                                impresionController.imprimirRecibo(
+                                    this@AvisoCobroDetalle,
+                                    consumoResponse
+                                )
+                            }
                         }
                     }
                 } else {
@@ -259,29 +256,22 @@ class AvisoCobroDetalle: AppCompatActivity() {
                         ?.string()?.trim()?.removeSurrounding("\"")
                         ?: "Error al procesar la lectura."
                     Log.e("API", " [PROCESAR LECTURA]HTTP ${response.code()}: $mensaje")
-                    runOnUiThread {
-                        alert?.dismisss()
-                        Toast.makeText(this@AvisoCobroDetalle, mensaje, Toast.LENGTH_LONG).show()
-                        if (mensaje == "ULTIMA_LECTURA_REQUERIDA"){
-                            mensajeLecturaAnterior(
-                                cuenta = lectura.Cuenta
-                            )
-                        }
+                    Toast.makeText(this@AvisoCobroDetalle, mensaje, Toast.LENGTH_LONG).show()
+                    if (mensaje == "ULTIMA_LECTURA_REQUERIDA") {
+                        mensajeLecturaAnterior(
+                            cuenta = lectura.Cuenta
+                        )
                     }
                 }
-
-            } catch (e: Exception) {
+            }catch (e: Exception) {
                 Log.e("REENVIAR_LECTURA", "Error conexión", e)
-                runOnUiThread {
-                    alert?.dismisss()
-                    Toast.makeText(
-                        this@AvisoCobroDetalle,
-                        "Error de conexión con el servidor",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            }
-            withContext(Dispatchers.Main){
+                Toast.makeText(
+                    this@AvisoCobroDetalle,
+                    "Error de conexión con el servidor",
+                    Toast.LENGTH_LONG
+                ).show()
+            }finally {
+                alert!!.dismisss()
                 isProcessing = false
                 binding.btnImprimirAviso.isEnabled = true
                 binding.btnEnviarPendiente.isEnabled = true

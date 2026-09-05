@@ -52,6 +52,7 @@ class AvisoLecturaAnterior: AppCompatActivity() {
     private var actividad: String =""
     private var idLecturaDetalle: Int = 0
     private var isProcessing  = false
+    private var lecturaActual: Double = 0.0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -92,8 +93,17 @@ class AvisoLecturaAnterior: AppCompatActivity() {
         cuenta = intent.getStringExtra("cuenta").toString()
         actividad = intent.getStringExtra("actividad").toString()
         lecturaVM = ViewModelProvider(this)[lecturaViewModel::class.java]
-        idPeriodo = periodo_prefs.getIdPeriodo()
         idLecturaDetalle = intent.getIntExtra("Id_lectura_detalle", 0)
+
+        if(actividad == "AVISO_COBRO"){
+            lecturaActual = intent.getDoubleExtra("lectura_actual",0.00)
+            cuenta = intent.getStringExtra("cuenta").toString()
+            idPeriodo = periodo_prefs.getIdPeriodo()
+        }else{
+            idPeriodo = periodo_prefs.getIdPeriodo()
+        }
+
+        //
     }
 
     private fun procesarLecturaAnterior(cuenta: String, lAnterior: Double, idLectura: Int){
@@ -111,6 +121,7 @@ class AvisoLecturaAnterior: AppCompatActivity() {
             }
             if (hayInternet) {
                 try {
+                    Log.d("API_REQUEST", " [API_REQUEST]HTTP: ${cuenta}, ${lAnterior}, ${idLectura}")
                     val response = api.procesarLecturaAnterior(
                         LecturaAnteriorRequest(
                             cuenta = cuenta,
@@ -173,12 +184,15 @@ class AvisoLecturaAnterior: AppCompatActivity() {
     private fun actProcesarLectura(){
         Log.d("AVISO","CERRANDO ACTIVIDAD")
         val intent = Intent(this@AvisoLecturaAnterior, AvisoCobro::class.java)
+        intent.putExtra("cuenta", cuenta)
+        intent.putExtra("lectura_actual", lecturaActual)
         startActivity(intent)
         finish()
     }
 
     private fun actDetalleLectura(){
         Log.d("DETALLE","CERRANDO ACTIVIDAD")
+        Log.d("AVISO","DATOS ENVIADOS A AVISO COBRO: ${lecturaActual}, ${cuenta}")
         val intent = Intent(this@AvisoLecturaAnterior, AvisoCobroDetalle::class.java)
         intent.putExtra("Id_lectura_detalle", idLecturaDetalle)
         startActivity(intent)
