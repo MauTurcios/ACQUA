@@ -5,6 +5,8 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.webkit.RenderProcessGoneDetail
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
@@ -42,12 +44,14 @@ class AvisoCobro : AppCompatActivity() {
     private var vendedor : String = ""
     private lateinit var preferencias: SharedPreferences
     private var isProcessing  = false
+    private var hayAnterior = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         alert = AlertDialogo(this@AvisoCobro, this)
         binding = ActivityAvisoCobroBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.lyLecturaAnterior.visibility = View.GONE
         lecturaVM = ViewModelProvider(this)[lecturaViewModel::class.java]
         preferencias = getSharedPreferences(instancia, MODE_PRIVATE)
         vendedor = preferencias.getString("nombreEmpleado", "").toString()
@@ -155,6 +159,7 @@ class AvisoCobro : AppCompatActivity() {
                                 alert?.dismisss()
                             }
                             onResult(consumoResponse)
+                            return@launch
                         }
                     } else {
                         val mensaje = response.errorBody()
@@ -325,7 +330,9 @@ class AvisoCobro : AppCompatActivity() {
         val cancelLectura = lAnteriorDialog.findViewById<TextView>(R.id.cancelLectura)
 
         procesarAnterior.setOnClickListener {
-            actLecturaAnterior(cuenta, lecturaActual)
+            hayAnterior = true
+            binding.lyLecturaAnterior.visibility = View.VISIBLE
+            //actLecturaAnterior(cuenta, lecturaActual)
             lAnteriorDialog.dismiss()
         }
         cancelLectura.setOnClickListener {
@@ -343,15 +350,8 @@ class AvisoCobro : AppCompatActivity() {
     }
 
     //FUNCION QUE ENVÍA A ACTIVIDAD AvisoLecturaAnterior
-    private fun actLecturaAnterior(cuenta: String, lecturaActual: Double){
-        Log.d("AVISO","CERRANDO ACTIVIDAD")
-        Log.d("AVISO","DATOS ENVIADOS A LECTURA ANTERIOR: ${lecturaActual}, ${cuenta}")
-        val intent = Intent(this@AvisoCobro, AvisoLecturaAnterior::class.java)
-        intent.putExtra("cuenta",cuenta)
-        intent.putExtra("lectura_actual", lecturaActual)
-        intent.putExtra("actividad","AVISO_COBRO")
-        startActivity(intent)
-        finish()
+    private fun procesarLecturaConAnterior(cuenta: String, lecturaAnterior: Double, lecturaActual: Double, idLectura: Int, empleado: String){
+
     }
 
 }

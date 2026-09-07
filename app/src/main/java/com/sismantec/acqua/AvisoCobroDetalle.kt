@@ -162,6 +162,7 @@ class AvisoCobroDetalle: AppCompatActivity() {
                         "No hay conexión a Internet",
                         Toast.LENGTH_LONG
                     ).show()
+                    habilitarOpcion()
                     return@launch
                 }
                 val response = api.procesarLectura(
@@ -244,10 +245,13 @@ class AvisoCobroDetalle: AppCompatActivity() {
                             e10_valor_m3 = consumoResponse.e10_valor_m3
                         ) {
                             cargarDatosLectura {
+                                alert?.dismisss()
+                                imprimiendo = true
                                 impresionController.imprimirRecibo(
                                     this@AvisoCobroDetalle,
                                     consumoResponse
                                 )
+                                habilitarOpcion()
                             }
                         }
                     }
@@ -257,6 +261,7 @@ class AvisoCobroDetalle: AppCompatActivity() {
                         ?: "Error al procesar la lectura."
                     Log.e("API", " [PROCESAR LECTURA]HTTP ${response.code()}: $mensaje")
                     Toast.makeText(this@AvisoCobroDetalle, mensaje, Toast.LENGTH_LONG).show()
+                    habilitarOpcion()
                     if (mensaje == "ULTIMA_LECTURA_REQUERIDA") {
                         mensajeLecturaAnterior(
                             cuenta = lectura.Cuenta
@@ -270,11 +275,7 @@ class AvisoCobroDetalle: AppCompatActivity() {
                     "Error de conexión con el servidor",
                     Toast.LENGTH_LONG
                 ).show()
-            }finally {
-                alert!!.dismisss()
-                isProcessing = false
-                binding.btnImprimirAviso.isEnabled = true
-                binding.btnEnviarPendiente.isEnabled = true
+                habilitarOpcion()
             }
         }
     }
@@ -387,4 +388,11 @@ class AvisoCobroDetalle: AppCompatActivity() {
         finish()
     }
 
+    private fun habilitarOpcion(){
+        alert!!.dismisss()
+        isProcessing = false
+        imprimiendo = false
+        binding.btnImprimirAviso.isEnabled = true
+        binding.btnEnviarPendiente.isEnabled = true
+    }
 }
