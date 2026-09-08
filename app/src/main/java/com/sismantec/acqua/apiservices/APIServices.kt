@@ -4,6 +4,7 @@ import com.sismantec.acqua.models.Cliente
 import com.sismantec.acqua.models.ConfigModel
 import com.sismantec.acqua.models.ConsumoResponse
 import com.sismantec.acqua.models.LecturaAnteriorRequest
+import com.sismantec.acqua.models.LecturaConAnteriorRequest
 import com.sismantec.acqua.models.LecturaRequest
 import com.sismantec.acqua.models.LoginModel
 import com.sismantec.acqua.models.LogoutModel
@@ -66,4 +67,9 @@ interface APIServices {
         @Body request: LecturaAnteriorRequest
     ): Response<RespuestaLecturaAnterior>
 
+    @Headers("Content-Type: application/json")
+    @POST("procesarlectura_con_anterior")
+    suspend fun procesarLecturaConAnterior (
+        @Body request: LecturaConAnteriorRequest
+    ): Response<ConsumoResponse>
 }

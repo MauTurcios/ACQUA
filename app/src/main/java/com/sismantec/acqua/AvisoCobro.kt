@@ -6,7 +6,6 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.webkit.RenderProcessGoneDetail
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
@@ -27,6 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.sismantec.acqua.models.LecturaConAnteriorRequest
 
 class AvisoCobro : AppCompatActivity() {
     private var alert: AlertDialogo?=null
@@ -99,6 +99,19 @@ class AvisoCobro : AppCompatActivity() {
             }
             binding.lyLectura.error = null
 
+            val lecturaAnterior = if (hayAnterior){
+                val valor = binding.txtLecturaAnterior.text.toString().trim().toDoubleOrNull()
+                if (valor == null){
+                    binding.lyLecturaAnterior.error = "Ingrese la lectura anterior"
+                    return@setOnClickListener
+                }
+                binding.lyLecturaAnterior.error = null
+                valor
+            }else{
+                null
+            }
+
+
             //VALIDAR SI LA CUENTA YA TIENE UNA LECTURA REGISTRADA EN LA APP
             lecturaVM.existeLecturaPendiente(cuenta){
                 existePendiente ->
@@ -111,12 +124,28 @@ class AvisoCobro : AppCompatActivity() {
                     return@existeLecturaPendiente
                 }
 
-                //SI LA CUENTA NO TIENE UNA LECTURA PENDIENTE REGISTRADA
-                procesarLectura(cuenta,lecturaTxt,idPeriodo,vendedor){
-                        consumo ->
-                    lecturaVM.guardarLectura(consumo) {
-                        impressionController.imprimirRecibo(this@AvisoCobro,consumo){
-                            actAvisoCobro()
+                if (hayAnterior && lecturaAnterior != null){
+                    procesarLecturaConAnterior(
+                        cuenta = cuenta,
+                        lecturaAnterior = lecturaAnterior,
+                        lecturaActual = lecturaTxt,
+                        idLectura = idPeriodo,
+                        empleado = vendedor
+                    ){ consumo ->
+                        lecturaVM.guardarLectura(consumo){
+                            impressionController.imprimirRecibo(this@AvisoCobro,consumo){
+                                actAvisoCobro()
+                            }
+                        }
+                    }
+                }else{
+                    //SI LA CUENTA NO TIENE UNA LECTURA PENDIENTE REGISTRADA Y HAY UNA LECTURA ANTERIOR REGISTRADA
+                    procesarLectura(cuenta,lecturaTxt,idPeriodo,vendedor){
+                            consumo ->
+                        lecturaVM.guardarLectura(consumo) {
+                            impressionController.imprimirRecibo(this@AvisoCobro,consumo){
+                                actAvisoCobro()
+                            }
                         }
                     }
                 }
@@ -170,10 +199,7 @@ class AvisoCobro : AppCompatActivity() {
                             alert?.dismisss()
                             Toast.makeText(this@AvisoCobro, mensaje, Toast.LENGTH_LONG).show()
                             if (mensaje == "ULTIMA_LECTURA_REQUERIDA"){
-                                mensajeLecturaAnterior(
-                                    cuenta = cuenta,
-                                    lecturaActual = lectura
-                                )
+                                mensajeLecturaAnterior()
                             }
                         }
                     }
@@ -321,7 +347,7 @@ class AvisoCobro : AppCompatActivity() {
     }
 
     //FUNCION QUE MUESTRA EL MENSAJE EN CASO NO EXISTA LECTURA ANTERIOR
-    private fun mensajeLecturaAnterior(cuenta: String, lecturaActual: Double){
+    private fun mensajeLecturaAnterior(){
         val lAnteriorDialog = Dialog(this,R.style.Theme_Dialog)
         lAnteriorDialog.setCancelable(false)
         lAnteriorDialog.setContentView(R.layout.dialog_lectura_anterior)
@@ -350,8 +376,78 @@ class AvisoCobro : AppCompatActivity() {
     }
 
     //FUNCION QUE ENVÍA A ACTIVIDAD AvisoLecturaAnterior
-    private fun procesarLecturaConAnterior(cuenta: String, lecturaAnterior: Double, lecturaActual: Double, idLectura: Int, empleado: String){
+    private fun procesarLecturaConAnterior(cuenta: String, lecturaAnterior: Double, lecturaActual: Double, idLectura: Int, empleado: String, onResult: (ConsumoResponse) -> Unit){
+        if(isProcessing) return
 
+        isProcessing = true
+        binding.btnEnviar.isEnabled = false
+        alert!!.Cargando()
+        val baseUrl = funciones.obtenerServidor(this)
+        val api = RetrofitCliente.obtenerApi(baseUrl)
+        lifecycleScope.launch{
+            val hayInternet = funciones.isInternetAvailable(this@AvisoCobro)
+            runOnUiThread {
+                alert!!.changeText("ENVIANDO LECTURA")
+            }
+            if (hayInternet) {
+                try {
+                    val response = api.procesarLecturaConAnterior(
+                        LecturaConAnteriorRequest(
+                            cuenta = cuenta,
+                            idLectura = idLectura,
+                            lectura_anterior = lecturaAnterior,
+                            lectura_actual = lecturaActual,
+                            empleado = empleado,
+                        )
+                    )
+                    if (response.isSuccessful) {
+                        response.body()?.let { consumoResponse ->
+                            delay(1500)
+                            runOnUiThread {
+                                alert!!.changeText("LECTURA PROCESADA CON EXITO")
+                            }
+                            delay(1500)
+                            runOnUiThread {
+                                alert?.dismisss()
+                            }
+                            onResult(consumoResponse)
+                            return@launch
+                        }
+                    } else {
+                        val mensaje = response.errorBody()
+                            ?.string()?.trim()?.removeSurrounding("\"")
+                            ?: "Error al procesar la lectura."
+                        Log.e("API", " [PROCESAR LECTURA]HTTP ${response.code()}: $mensaje")
+                        runOnUiThread {
+                            alert?.dismisss()
+                            Toast.makeText(this@AvisoCobro, mensaje, Toast.LENGTH_LONG).show()
+                        }
+                    }
+                } catch (e: Exception) {
+                    runOnUiThread {
+                        alert?.dismisss()
+                        Toast.makeText(
+                            this@AvisoCobro,
+                            "Error de conexión con el servidor",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                    Log.e("API", "[PROCESAR LECTURA] Error conexión", e)
+                }
+            }else{
+                alert?.dismisss()
+                Log.e("API", "[PROCESAR LECTURA] Error conexión a internet")
+                Toast.makeText(
+                    this@AvisoCobro,
+                    "Se requiere conexión a Internet para registrar la lectura anterior",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            withContext(Dispatchers.Main){
+                isProcessing = false
+                binding.btnEnviar.isEnabled = true
+            }
+        }
     }
 
 }
