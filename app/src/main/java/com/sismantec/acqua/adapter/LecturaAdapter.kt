@@ -1,19 +1,12 @@
 package com.sismantec.acqua.adapter
 
-import android.annotation.SuppressLint
-import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.constraintlayout.helper.widget.Layer
 import androidx.recyclerview.widget.RecyclerView
 import com.sismantec.acqua.entities.LecturaEntity
 import com.sismantec.acqua.R
-import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.sismantec.acqua.AvisoCobroDetalle
 
 
 class LecturaAdapter(
@@ -28,7 +21,7 @@ class LecturaAdapter(
         val txtConsumo: TextView = view.findViewById(R.id.lecConsumo)
 
         fun bind(tarjeta: LecturaEntity){
-            var estado = "ENVIADA"
+            var estado: String
             if (tarjeta.Lectura_enviada == true){
                 estado = "LECTURA ENVIADA"
                 txtEstado.setBackgroundResource(R.color.colorVerde)

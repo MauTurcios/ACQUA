@@ -4,7 +4,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.sismantec.acqua.entities.ClientesEntity
 import kotlinx.coroutines.flow.Flow
 import com.sismantec.acqua.entities.RutasEntity
 

@@ -1,42 +1,24 @@
 package com.sismantec.acqua
 
-import android.Manifest
-import android.app.Dialog
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.service.autofill.ImageTransformation
 import android.util.Log
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
-import androidx.annotation.CallSuper
-import androidx.annotation.MainThread
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.sismantec.acqua.Util.PeriodoPreferences
 import com.sismantec.acqua.apiservices.RetrofitCliente
-import com.sismantec.acqua.controller.ImpresionController
-import com.sismantec.acqua.database.AppDataBase
-import com.sismantec.acqua.databinding.ActivityAvisoCobroBinding
 import com.sismantec.acqua.databinding.ActivityLecturaAnteriorBinding
-import com.sismantec.acqua.entities.ClientesEntity
-import com.sismantec.acqua.entities.LecturaEntity
 import com.sismantec.acqua.funciones.Funciones
-import com.sismantec.acqua.models.ConsumoResponse
 import com.sismantec.acqua.models.LecturaAnteriorRequest
-import com.sismantec.acqua.viewmodel.clienteViewModel
-import com.sismantec.acqua.models.LecturaRequest
 import com.sismantec.acqua.viewmodel.lecturaViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.Interceptor
 
 class AvisoLecturaAnterior: AppCompatActivity() {
     private var alert: AlertDialogo?=null

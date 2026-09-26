@@ -8,18 +8,13 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.addCallback
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.sismantec.acqua.controller.ClientesController
 import com.sismantec.acqua.controller.LoginController
 import com.sismantec.acqua.databinding.ActivityLoginBinding
 import com.sismantec.acqua.funciones.Funciones
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 

@@ -24,8 +24,6 @@ import com.sismantec.acqua.models.LecturaRequest
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.sismantec.acqua.models.ConsumoResponse
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class AvisoCobroDetalle: AppCompatActivity() {
     private lateinit var binding: ActivityLecturaDetalleBinding

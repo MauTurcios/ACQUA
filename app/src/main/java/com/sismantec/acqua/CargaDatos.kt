@@ -2,44 +2,23 @@ package com.sismantec.acqua
 
 import android.content.Intent
 import android.os.Bundle
-import android.app.Dialog
 import androidx.activity.addCallback
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import android.content.Context
 import android.content.SharedPreferences
-import android.view.View
-import android.widget.AdapterView
-import android.widget.AdapterView.OnItemSelectedListener
-import android.widget.ArrayAdapter
-import android.widget.Spinner
-import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.core.content.edit
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.textfield.TextInputEditText
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.time.LocalDate
 import com.sismantec.acqua.databinding.ActivityCargaDatosBinding
 import  com.sismantec.acqua.controller.ClientesController
 import com.sismantec.acqua.controller.LoginController
-import com.sismantec.acqua.dao.ConfigDAO
 import com.sismantec.acqua.database.AppDataBase
 import com.sismantec.acqua.funciones.Funciones
 import com.sismantec.acqua.viewmodel.clienteViewModel
 import com.sismantec.acqua.viewmodel.lecturaViewModel
 import com.sismantec.acqua.viewmodel.rutaViewModel
-import kotlinx.coroutines.coroutineScope
-import okhttp3.Dispatcher
 
 
 class CargaDatos : AppCompatActivity() {

@@ -4,17 +4,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.addCallback
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import com.sismantec.acqua.Util.PeriodoPreferences
 import com.sismantec.acqua.controller.LoginController
 import com.sismantec.acqua.databinding.ActivityInicioBinding
 import kotlinx.coroutines.Dispatchers

@@ -5,11 +5,6 @@ import android.os.Bundle
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.sismantec.acqua.databinding.ActivityMenuClientesBinding
-import com.sismantec.acqua.models.Cliente
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import android.content.Context
 import android.content.SharedPreferences
 import android.text.Editable
 import android.text.TextWatcher
@@ -19,25 +14,18 @@ import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.SearchView
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.observe
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputEditText
 import com.sismantec.acqua.adapter.ClienteAdapter
-import com.sismantec.acqua.apiservices.APIServices
 import com.sismantec.acqua.controller.ClientesController
 import com.sismantec.acqua.entities.ClientesEntity
 import com.sismantec.acqua.entities.RutasEntity
 import com.sismantec.acqua.funciones.Funciones
 import com.sismantec.acqua.viewmodel.clienteViewModel
 import com.sismantec.acqua.viewmodel.rutaViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.observeOn
 import kotlin.collections.emptyList
 
 class MenuClientes : AppCompatActivity() {

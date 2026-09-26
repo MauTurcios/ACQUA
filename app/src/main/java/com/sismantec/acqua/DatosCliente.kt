@@ -7,15 +7,8 @@ import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.sismantec.acqua.database.AppDataBase
 import com.sismantec.acqua.databinding.ActivityDatosClienteBinding
-import com.sismantec.acqua.databinding.ActivityMenuClientesBinding
-import com.sismantec.acqua.models.Cliente
 import com.sismantec.acqua.viewmodel.clienteViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class DatosCliente: AppCompatActivity() {
     private lateinit var biding: ActivityDatosClienteBinding

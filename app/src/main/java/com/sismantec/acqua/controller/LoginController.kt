@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.core.content.edit
 import com.sismantec.acqua.apiservices.RetrofitCliente
-import com.sismantec.acqua.entities.ConfigEntity
 import com.sismantec.acqua.funciones.Funciones
 import com.sismantec.acqua.models.LoginModel
 import com.sismantec.acqua.models.LogoutModel

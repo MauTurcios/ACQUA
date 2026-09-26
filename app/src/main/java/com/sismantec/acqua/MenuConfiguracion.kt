@@ -2,7 +2,6 @@ package com.sismantec.acqua
 
 import android.Manifest
 import android.app.Dialog
-import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -19,7 +18,6 @@ import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.lifecycle.Lifecycle

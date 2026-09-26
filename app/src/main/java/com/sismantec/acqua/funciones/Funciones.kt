@@ -24,7 +24,6 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
-import androidx.appcompat.app.AlertDialog
 import com.sismantec.acqua.AlertDialogo
 import com.sismantec.acqua.R
 

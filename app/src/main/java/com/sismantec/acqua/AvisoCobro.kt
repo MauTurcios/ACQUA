@@ -27,7 +27,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import com.sismantec.acqua.models.LecturaConAnteriorRequest
-import androidx.core.widget.doAfterTextChanged
 
 class AvisoCobro : AppCompatActivity() {
     private var alert: AlertDialogo?=null

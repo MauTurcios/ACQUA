@@ -1,14 +1,7 @@
 package com.sismantec.acqua.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
-import com.sismantec.acqua.database.AppDataBase
 import com.sismantec.acqua.domain.usecase.ObtenerImpresorasVinculadasUseCase
-import com.sismantec.acqua.entities.ConfigEntity
 import com.sismantec.acqua.repository.BluetoothRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

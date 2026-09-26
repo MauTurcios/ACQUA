@@ -1,31 +1,16 @@
 package com.sismantec.acqua.controller
 
-import android.content.ContentValues
-import android.database.sqlite.SQLiteDatabase
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelStore
-import androidx.lifecycle.ViewModelStoreOwner
-import androidx.room.Dao
 import com.sismantec.acqua.funciones.Funciones
 import com.sismantec.acqua.Util.SslNoSeguro
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.json.JSONArray
 import com.sismantec.acqua.apiservices.RetrofitCliente
-import com.sismantec.acqua.dao.ClientesDAO
-import com.sismantec.acqua.dao.ConfigDAO
 import com.sismantec.acqua.entities.ClientesEntity
-import com.sismantec.acqua.entities.ConfigEntity
 import com.sismantec.acqua.entities.RutasEntity
-import com.sismantec.acqua.models.Cliente
 import com.sismantec.acqua.viewmodel.clienteViewModel
 import com.sismantec.acqua.viewmodel.rutaViewModel
-import kotlinx.coroutines.processNextEventInCurrentThread
-import java.net.IDN
 
 
 class ClientesController {
