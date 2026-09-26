@@ -27,6 +27,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import com.sismantec.acqua.models.LecturaConAnteriorRequest
+import androidx.core.widget.doAfterTextChanged
 
 class AvisoCobro : AppCompatActivity() {
     private var alert: AlertDialogo?=null
@@ -36,7 +37,6 @@ class AvisoCobro : AppCompatActivity() {
     private lateinit var impressionController: ImpresionController
     //private var clienteLectura: ClientesEntity? = null
     private var funciones = Funciones()
-
     private lateinit var periodo_prefs: PeriodoPreferences
     private var periodo_concepto: String = ""
     private var idPeriodo: Int = 0
@@ -82,6 +82,7 @@ class AvisoCobro : AppCompatActivity() {
             finish()
         }
 
+        //PROCESAR LECTURA
         binding.btnEnviar.setOnClickListener {
             // VALIDAR QUE CUENTA NO SE UN CAMPO VACÍO
             val cuenta = binding.txtClienteLectura.text.toString().trim()
@@ -99,6 +100,7 @@ class AvisoCobro : AppCompatActivity() {
             }
             binding.lyLectura.error = null
 
+            //VALIDAR SI HAY LECTURA ANTERIOR, Y SI HAY QUE LECTURA ANTERIOR NO SEA UN CAMPO VACÍO
             val lecturaAnterior = if (hayAnterior){
                 val valor = binding.txtLecturaAnterior.text.toString().trim().toDoubleOrNull()
                 if (valor == null){
@@ -110,7 +112,6 @@ class AvisoCobro : AppCompatActivity() {
             }else{
                 null
             }
-
 
             //VALIDAR SI LA CUENTA YA TIENE UNA LECTURA REGISTRADA EN LA APP
             lecturaVM.existeLecturaPendiente(cuenta){
@@ -124,6 +125,7 @@ class AvisoCobro : AppCompatActivity() {
                     return@existeLecturaPendiente
                 }
 
+                //SI LA CUENTA NO TIENE UNA LECTURA PENDIENTE REGISTRADA Y NO HAY UNA LECTURA ANTERIOR REGISTRADA
                 if (hayAnterior && lecturaAnterior != null){
                     procesarLecturaConAnterior(
                         cuenta = cuenta,
@@ -292,7 +294,6 @@ class AvisoCobro : AppCompatActivity() {
                     Cf5_linea = "",
                     Cf5_descripcion = "",
                     Cf5_precio = 0.00,
-
                     //PLIEGO TARIFARIO
                     Minimo_m3 = 0,
                     Primeros_m3 = 0.00,
@@ -358,6 +359,7 @@ class AvisoCobro : AppCompatActivity() {
         procesarAnterior.setOnClickListener {
             hayAnterior = true
             binding.lyLecturaAnterior.visibility = View.VISIBLE
+            binding.txtClienteLectura.isEnabled = false
             //actLecturaAnterior(cuenta, lecturaActual)
             lAnteriorDialog.dismiss()
         }
@@ -375,7 +377,7 @@ class AvisoCobro : AppCompatActivity() {
         finish()
     }
 
-    //FUNCION QUE ENVÍA A ACTIVIDAD AvisoLecturaAnterior
+    //FUNCION QUE ENVÍA PROCESA LECTURA ANTERIOR Y LECTURA ACTUAL
     private fun procesarLecturaConAnterior(cuenta: String, lecturaAnterior: Double, lecturaActual: Double, idLectura: Int, empleado: String, onResult: (ConsumoResponse) -> Unit){
         if(isProcessing) return
 
@@ -397,7 +399,7 @@ class AvisoCobro : AppCompatActivity() {
                             idLectura = idLectura,
                             lectura_anterior = lecturaAnterior,
                             lectura_actual = lecturaActual,
-                            empleado = empleado,
+                            empleado = empleado
                         )
                     )
                     if (response.isSuccessful) {

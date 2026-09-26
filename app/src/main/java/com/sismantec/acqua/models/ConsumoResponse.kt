@@ -1,8 +1,5 @@
 package com.sismantec.acqua.models
 
-import java.sql.Date
-
-
 data class ConsumoResponse(
     //DATOS GENERALES DE LA LECTURA
     val cuenta: String,

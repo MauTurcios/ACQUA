@@ -64,11 +64,13 @@ class AvisoCobroDetalle: AppCompatActivity() {
         binding.btnAtras.setOnClickListener {
             actAvisoCobro()
         }
+
         binding.btnEnviarPendiente.setOnClickListener {
             lecturaDetalle?.let { lectura ->
                 procesarLecturaPendiente(lectura)
             }
         }
+
         binding.btnImprimirAviso.setOnClickListener {
             if (imprimiendo){
                 return@setOnClickListener
@@ -264,7 +266,8 @@ class AvisoCobroDetalle: AppCompatActivity() {
                     habilitarOpcion()
                     if (mensaje == "ULTIMA_LECTURA_REQUERIDA") {
                         mensajeLecturaAnterior(
-                            cuenta = lectura.Cuenta
+                            cuenta = lectura.Cuenta,
+                            idPeriodo = lectura.Periodo
                         )
                     }
                 }
@@ -359,7 +362,7 @@ class AvisoCobroDetalle: AppCompatActivity() {
     }
 
     //FUNCION QUE MUESTRA EL MENSAJE EN CASO NO EXISTA LECTURA ANTERIOR
-    private fun mensajeLecturaAnterior(cuenta: String){
+    private fun mensajeLecturaAnterior(cuenta: String, idPeriodo: Int){
         val lAnteriorDialog = Dialog(this,R.style.Theme_Dialog)
         lAnteriorDialog.setCancelable(false)
         lAnteriorDialog.setContentView(R.layout.dialog_lectura_anterior)
@@ -368,7 +371,7 @@ class AvisoCobroDetalle: AppCompatActivity() {
         val cancelLectura = lAnteriorDialog.findViewById<TextView>(R.id.cancelLectura)
 
         procesarAnterior.setOnClickListener {
-            actLecturaAnterior(cuenta)
+            actLecturaAnterior(cuenta, idPeriodo)
             lAnteriorDialog.dismiss()
         }
         cancelLectura.setOnClickListener {
@@ -378,16 +381,18 @@ class AvisoCobroDetalle: AppCompatActivity() {
     }
 
     //FUNCION QUE ENVÍA A LA ACTIVIDAD AvisoLecturaAnterior
-    private fun actLecturaAnterior(cuenta: String){
+    private fun actLecturaAnterior(cuenta: String, idPeriodo: Int){
         Log.d("AVISO","CERRANDO ACTIVIDAD")
         val intent = Intent(this@AvisoCobroDetalle, AvisoLecturaAnterior::class.java)
         intent.putExtra("cuenta",cuenta)
         intent.putExtra("actividad","DETALLE_AVISO")
         intent.putExtra("Id_lectura_detalle", idLecturaDetalle)
+        intent.putExtra("Id_periodo_detalle",idPeriodo)
         startActivity(intent)
         finish()
     }
 
+    //FUNCION PARA HABILITAR BOTONES
     private fun habilitarOpcion(){
         alert!!.dismisss()
         isProcessing = false

@@ -144,7 +144,7 @@ class ConexionServidor : AppCompatActivity() {
         }
     }
 
-
+    //FUNCION PARA ACTUALIZAR CONEXION CON EL SERVIDOR
     private fun actualizaConexionServidor(){
         if (isProcessing) return
         val ip = binding.txtIpServidor.text.toString()
@@ -198,19 +198,16 @@ class ConexionServidor : AppCompatActivity() {
         finish()
     }
 
-    //Funcion para redireccion a la pantalla de Salones
+    //Funcion para redireccion a la pantalla de Inicio
     private fun inicio() {
         val intent = Intent(this@ConexionServidor, Inicio::class.java)
         startActivity(intent)
         finish()
     }
 
+    //FUNCION PARA LIMPIAR SHARED PREFERENCES
     fun limpiarPrefs() {
         preferences.edit().clear().apply()
         periodo_prefs.edit().clear().apply()
     }
-
-
-
-
 }

@@ -66,12 +66,9 @@ class AvisoLecturaAnterior: AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         binding.btnAtras.setOnClickListener {
-            if (actividad.contains("AVISO_COBRO")){
-                actProcesarLectura()
-            }else{
-                actDetalleLectura()
-            }
+            actDetalleLectura()
         }
+
         binding.txtInfoCuenta.setText("LECTURA ANTERIOR DE LA CUENTA: $cuenta")
 
         binding.btnEnviar.setOnClickListener {
@@ -81,11 +78,19 @@ class AvisoLecturaAnterior: AppCompatActivity() {
                 return@setOnClickListener
             }
             binding.lyLectura.error = null
+
+            if (idPeriodo == 0){
+                binding.lyLectura.error = "El periodo es incorrecto"
+                return@setOnClickListener
+            }
+            binding.lyLectura.error = null
+
             procesarLecturaAnterior(cuenta,lecturaTxt,idPeriodo)
         }
         Log.d("PROVIENE",actividad)
     }
 
+    //FUNCION PARA INICIALIZAR VARIABLES
     private fun iniVar(){
         preferencias = getSharedPreferences(instancia, MODE_PRIVATE)
         periodo_prefs = PeriodoPreferences(this@AvisoLecturaAnterior)
@@ -100,12 +105,13 @@ class AvisoLecturaAnterior: AppCompatActivity() {
             cuenta = intent.getStringExtra("cuenta").toString()
             idPeriodo = periodo_prefs.getIdPeriodo()
         }else{
-            idPeriodo = periodo_prefs.getIdPeriodo()
+            idPeriodo = intent.getIntExtra("Id_periodo_detalle", 0)
         }
 
         //
     }
 
+    //FUNCION PARA PROCESAR LA LECTURA ANTERIOR
     private fun procesarLecturaAnterior(cuenta: String, lAnterior: Double, idLectura: Int){
         if (isProcessing) return
 
@@ -137,11 +143,7 @@ class AvisoLecturaAnterior: AppCompatActivity() {
                         runOnUiThread {
                             alert?.dismisss()
                         }
-                        if (actividad.contains("AVISO_COBRO")){
-                            actProcesarLectura()
-                        }else{
-                            actDetalleLectura()
-                        }
+                        actDetalleLectura()
                     }else{
                         val mensaje = response.errorBody()
                             ?.string()?.trim()?.removeSurrounding("\"")
@@ -181,6 +183,7 @@ class AvisoLecturaAnterior: AppCompatActivity() {
         }
     }
 
+    /*
     private fun actProcesarLectura(){
         Log.d("AVISO","CERRANDO ACTIVIDAD")
         val intent = Intent(this@AvisoLecturaAnterior, AvisoCobro::class.java)
@@ -189,7 +192,9 @@ class AvisoLecturaAnterior: AppCompatActivity() {
         startActivity(intent)
         finish()
     }
+     */
 
+    //FUNCION PARA REGRESAR A LA ACTIVIDAD AvisoCobroDetalle
     private fun actDetalleLectura(){
         Log.d("DETALLE","CERRANDO ACTIVIDAD")
         Log.d("AVISO","DATOS ENVIADOS A AVISO COBRO: ${lecturaActual}, ${cuenta}")
